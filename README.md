@@ -2,74 +2,74 @@
 
 A web app for logging workouts and exercises. Create an account, log your sessions and track sets, reps and weight.
 
-## Teknikstack
+## Tech stack
 
-| Del | Teknologi |
-|-----|-----------|
+| Layer | Technology |
+|-------|------------|
 | Backend | Python, FastAPI, SQLAlchemy |
-| Databas | PostgreSQL |
+| Database | PostgreSQL |
 | Frontend | React, TypeScript, Vite |
 | Auth | JWT via HTTP-only cookie |
-| Driftsättning | Vercel |
+| Deployment | Vercel |
 
 ---
 
-## Driftsättning på Vercel
+## Deploying to Vercel
 
-Projektet är uppdelat i två separata Vercel-projekt — ett för backend och ett för frontend.
+The project is split into two separate Vercel projects — one for the backend and one for the frontend.
 
-### 1. Lägg upp koden på GitHub
+### 1. Push the code to GitHub
 
-Pusha hela repot till GitHub innan du fortsätter.
+Push the full repo to GitHub before continuing.
 
 ### 2. Backend
 
-1. Gå till [vercel.com](https://vercel.com) → **Add New Project**
-2. Importera repot och sätt **Root Directory** till `backend`
-3. Lägg till dessa miljövariabler under **Environment Variables**:
+1. Go to [vercel.com](https://vercel.com) → **Add New Project**
+2. Import the repo and set **Root Directory** to `backend`
+3. Add the following environment variables under **Environment Variables**:
 
-| Variabel | Värde |
+| Variable | Value |
 |----------|-------|
-| `DATABASE_URL` | Hämtas från Vercel Postgres (se nedan) |
-| `SECRET_KEY` | Generera med `openssl rand -hex 32` |
+| `DATABASE_URL` | Provided by Vercel Postgres (see below) |
+| `SECRET_KEY` | Generate with `openssl rand -hex 32` |
 | `ENVIRONMENT` | `production` |
-| `ALLOWED_ORIGINS` | Din frontend-URL, t.ex. `https://traningsdagbok.vercel.app` |
+| `ALLOWED_ORIGINS` | Your frontend URL, e.g. `https://workout-log.vercel.app` |
 
-**Skapa databasen:** I Vercel-dashboarden → **Storage** → **Create Database** → välj **Postgres**. Koppla den till backend-projektet — `DATABASE_URL` sätts då automatiskt.
+**Create the database:** In the Vercel dashboard → **Storage** → **Create Database** → choose **Postgres**. Connect it to the backend project — `DATABASE_URL` will be set automatically.
 
-4. Deploya. Backend-URL:en ser ut som `https://traningsdagbok-api.vercel.app`.
+4. Deploy. The backend URL will look like `https://workout-log-api.vercel.app`.
 
 ### 3. Frontend
 
-1. Skapa ett nytt Vercel-projekt, samma repo men **Root Directory** satt till `frontend`
-2. Lägg till miljövariabel:
+1. Create a new Vercel project from the same repo, but set **Root Directory** to `frontend`
+2. Add the environment variable:
 
-| Variabel | Värde |
+| Variable | Value |
 |----------|-------|
-| `VITE_API_URL` | Din backend-URL, t.ex. `https://traningsdagbok-api.vercel.app` |
+| `VITE_API_URL` | Your backend URL, e.g. `https://workout-log-api.vercel.app` |
 
-3. Deploya.
+3. Deploy.
 
 ---
 
-## Lokal utveckling
+## Local development
 
-### Förutsättningar
+### Prerequisites
 
 - Python 3.11+
 - Node.js 18+
-- MySQL eller PostgreSQL
+- PostgreSQL
 
 ### Backend
 
 ```bash
 cd backend
 pip install -r requirements.txt
-cp .env.example .env   # fyll i DATABASE_URL och SECRET_KEY
+cp .env.example .env   # fill in DATABASE_URL and SECRET_KEY
 uvicorn app:app --reload
 ```
 
-API:et körs på `http://localhost:8000` — dokumentation på `http://localhost:8000/docs`.
+API runs at `http://localhost:8000` — documentation at `http://localhost:8000/docs`.
 
 ### Frontend
 
@@ -79,39 +79,39 @@ npm install
 npm run dev
 ```
 
-Appen körs på `http://localhost:5173`.
+App runs at `http://localhost:5173`.
 
 ---
 
-## Miljövariabler
+## Environment variables
 
 ### Backend (`backend/.env`)
 
-| Variabel | Beskrivning |
+| Variable | Description |
 |----------|-------------|
-| `DATABASE_URL` | Databasanslutning (PostgreSQL eller MySQL) |
-| `SECRET_KEY` | Slumpmässig nyckel för JWT-signering |
-| `ENVIRONMENT` | `development` eller `production` |
-| `ALLOWED_ORIGINS` | Kommaseparerade frontend-URL:er |
+| `DATABASE_URL` | Database connection string (PostgreSQL) |
+| `SECRET_KEY` | Random key for JWT signing |
+| `ENVIRONMENT` | `development` or `production` |
+| `ALLOWED_ORIGINS` | Comma-separated list of frontend URLs |
 
 ### Frontend (`frontend/.env`)
 
-| Variabel | Beskrivning |
+| Variable | Description |
 |----------|-------------|
-| `VITE_API_URL` | URL till backend-API:et |
+| `VITE_API_URL` | URL to the backend API |
 
 ---
 
-## API-endpoints
+## API endpoints
 
-| Metod | Endpoint | Beskrivning | Auth |
-|-------|----------|-------------|------|
-| POST | `/users` | Registrera konto | Nej |
-| POST | `/auth/login` | Logga in | Nej |
-| POST | `/auth/logout` | Logga ut | Ja |
-| GET | `/auth/me` | Hämta inloggad användare | Ja |
-| GET | `/sessions` | Lista träningspass | Ja |
-| POST | `/sessions` | Skapa nytt pass | Ja |
-| GET | `/sessions/{id}` | Hämta pass med övningar | Ja |
-| DELETE | `/sessions/{id}` | Ta bort pass | Ja |
-| POST | `/sessions/{id}/exercises` | Lägg till övning | Ja |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/users` | Register account | No |
+| POST | `/auth/login` | Log in | No |
+| POST | `/auth/logout` | Log out | Yes |
+| GET | `/auth/me` | Get current user | Yes |
+| GET | `/sessions` | List workouts | Yes |
+| POST | `/sessions` | Create workout | Yes |
+| GET | `/sessions/{id}` | Get workout with exercises | Yes |
+| DELETE | `/sessions/{id}` | Delete workout | Yes |
+| POST | `/sessions/{id}/exercises` | Add exercise | Yes |

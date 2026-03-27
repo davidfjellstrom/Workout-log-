@@ -15,7 +15,7 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Kommaseparerade origins sätts som env-variabel i Vercel-dashboarden
+
 _raw_origins = os.getenv(
     "ALLOWED_ORIGINS",
     "http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174",
@@ -25,7 +25,7 @@ ALLOWED_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Starting Träningsdagbok API...")
+    logger.info("Starting Workout Log API...")
     init_db()
     yield
 
@@ -57,15 +57,15 @@ async def root():
         "message": "Welcome to Workout Log API!",
         "docs": "/docs",
         "endpoints": {
-            "POST /users": "Registrera konto",
-            "POST /auth/login": "Logga in",
-            "POST /auth/logout": "Logga ut",
-            "GET /auth/me": "Hämta inloggad användare",
-            "GET /sessions": "Lista dina träningspass",
-            "POST /sessions": "Skapa nytt pass",
-            "GET /sessions/{id}": "Hämta ett pass med övningar",
-            "DELETE /sessions/{id}": "Ta bort ett pass",
-            "POST /sessions/{id}/exercises": "Lägg till övning på ett pass",
+            "POST /users": "Register account",
+            "POST /auth/login": "Log in",
+            "POST /auth/logout": "Log out",
+            "GET /auth/me": "Get current user",
+            "GET /sessions": "List workouts",
+            "POST /sessions": "Create workout",
+            "GET /sessions/{id}": "Get workout with exercises",
+            "DELETE /sessions/{id}": "Delete workout",
+            "POST /sessions/{id}/exercises": "Add exercise",
         },
     }
 
