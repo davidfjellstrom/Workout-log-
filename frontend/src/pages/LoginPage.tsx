@@ -17,9 +17,9 @@ export default function LoginPage() {
 
     try {
       await login(username, password);
-      navigate('/sessions'); // Skicka till passlistan efter inloggning
+      navigate('/sessions');
     } catch {
-      setError('Fel användarnamn eller lösenord');
+      setError('Incorrect username or password');
     } finally {
       setLoading(false);
     }
@@ -28,10 +28,10 @@ export default function LoginPage() {
   return (
     <div className="page-container">
       <div className="form-wrapper">
-        <h1>Logga in</h1>
+        <h1>Log in</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Användarnamn:</label>
+            <label htmlFor="username">Username:</label>
             <input
               type="text"
               id="username"
@@ -41,7 +41,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Lösenord:</label>
+            <label htmlFor="password">Password:</label>
             <input
               type="password"
               id="password"
@@ -52,11 +52,11 @@ export default function LoginPage() {
           </div>
           {error && <p className="error-message">{error}</p>}
           <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? 'Loggar in...' : 'Logga in'}
+            {loading ? 'Logging in...' : 'Log in'}
           </button>
         </form>
         <p style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem' }}>
-          Inget konto? <Link to="/register">Registrera dig här</Link>
+          No account? <Link to="/register">Register here</Link>
         </p>
       </div>
     </div>

@@ -14,11 +14,11 @@ export default function RegisterPage() {
     setError('');
 
     if (username.length < 3) {
-      setError('Användarnamnet måste vara minst 3 tecken');
+      setError('Username must be at least 3 characters');
       return;
     }
     if (password.length < 6) {
-      setError('Lösenordet måste vara minst 6 tecken');
+      setError('Password must be at least 6 characters');
       return;
     }
 
@@ -27,7 +27,7 @@ export default function RegisterPage() {
       await createUser({ username, password });
       navigate('/login');
     } catch {
-      setError('Användarnamnet är redan taget eller något gick fel');
+      setError('Username is already taken or something went wrong');
     } finally {
       setLoading(false);
     }
@@ -36,37 +36,37 @@ export default function RegisterPage() {
   return (
     <div className="page-container">
       <div className="form-wrapper">
-        <h1>Skapa konto</h1>
+        <h1>Create account</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Användarnamn:</label>
+            <label htmlFor="username">Username:</label>
             <input
               type="text"
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Minst 3 tecken"
+              placeholder="At least 3 characters"
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Lösenord:</label>
+            <label htmlFor="password">Password:</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Minst 6 tecken"
+              placeholder="At least 6 characters"
               required
             />
           </div>
           {error && <p className="error-message">{error}</p>}
           <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? 'Skapar konto...' : 'Skapa konto'}
+            {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
         <p style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.9rem' }}>
-          Har du redan ett konto? <Link to="/login">Logga in här</Link>
+          Already have an account? <Link to="/login">Log in here</Link>
         </p>
       </div>
     </div>

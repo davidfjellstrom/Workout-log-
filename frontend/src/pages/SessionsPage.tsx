@@ -8,14 +8,13 @@ export default function SessionsPage() {
   const [sessions, setSessions] = useState<SessionListItem[]>([]);
   const [error, setError] = useState('');
 
-  // Hämta alla pass när sidan laddas
   useEffect(() => {
     const fetchSessions = async () => {
       try {
         const data = await getSessions();
         setSessions(data);
       } catch {
-        setError('Kunde inte hämta träningspass');
+        setError('Could not load workouts');
       }
     };
 
@@ -23,28 +22,27 @@ export default function SessionsPage() {
   }, []);
 
   const handleDelete = async (id: number, title: string) => {
-    if (!confirm(`Vill du ta bort passet "${title}"?`)) return;
+    if (!confirm(`Delete workout "${title}"?`)) return;
 
     try {
       await deleteSession(id);
-      // Ta bort passet ur listan utan att hämta om från servern
       setSessions((prev) => prev.filter((s) => s.id !== id));
     } catch {
-      setError('Kunde inte ta bort passet');
+      setError('Could not delete workout');
     }
   };
 
   return (
     <div className="page-container">
       <div className="sessions-header">
-        <h1>Mina träningspass</h1>
-        <Link to="/sessions/new" className="new-session-button">+ Nytt pass</Link>
+        <h1>My Workouts</h1>
+        <Link to="/sessions/new" className="new-session-button">+ New workout</Link>
       </div>
 
       {error && <p className="error-message">{error}</p>}
 
       {sessions.length === 0 ? (
-        <p className="empty-message">Du har inga pass än. Skapa ditt första!</p>
+        <p className="empty-message">No workouts yet. Create your first one!</p>
       ) : (
         <ul className="sessions-list">
           {sessions.map((session) => (
@@ -52,13 +50,13 @@ export default function SessionsPage() {
               <Link to={`/sessions/${session.id}`} className="session-link">
                 <span className="session-title">{session.title}</span>
                 <span className="session-date">{session.date}</span>
-                <span className="session-count">{session.exercise_count} övningar</span>
+                <span className="session-count">{session.exercise_count} exercises</span>
               </Link>
               <button
                 className="delete-button"
                 onClick={() => handleDelete(session.id, session.title)}
               >
-                Ta bort
+                Delete
               </button>
             </li>
           ))}

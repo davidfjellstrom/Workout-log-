@@ -10,7 +10,6 @@ export default function SessionDetailPage() {
   const [session, setSession] = useState<Session | null>(null);
   const [error, setError] = useState('');
 
-  // Formulär för ny övning
   const [name, setName] = useState('');
   const [sets, setSets] = useState('');
   const [reps, setReps] = useState('');
@@ -18,14 +17,13 @@ export default function SessionDetailPage() {
   const [formError, setFormError] = useState('');
   const [addingExercise, setAddingExercise] = useState(false);
 
-  // Hämta passet med övningar när sidan laddas
   useEffect(() => {
     const fetchSession = async () => {
       try {
         const data = await getSession(Number(id));
         setSession(data);
       } catch {
-        setError('Kunde inte hämta träningspasset');
+        setError('Could not load workout');
       }
     };
 
@@ -45,25 +43,23 @@ export default function SessionDetailPage() {
         weight_kg: weightKg ? Number(weightKg) : undefined,
       });
 
-      // Lägg till övningen i listan utan att hämta om hela passet
       setSession((prev) =>
         prev ? { ...prev, exercises: [...prev.exercises, newExercise] } : prev
       );
 
-      // Rensa formuläret
       setName('');
       setSets('');
       setReps('');
       setWeightKg('');
     } catch {
-      setFormError('Kunde inte lägga till övningen');
+      setFormError('Could not add exercise');
     } finally {
       setAddingExercise(false);
     }
   };
 
   if (error) return <div className="page-container"><p className="error-message">{error}</p></div>;
-  if (!session) return <div className="page-container"><p>Laddar...</p></div>;
+  if (!session) return <div className="page-container"><p>Loading...</p></div>;
 
   return (
     <div className="page-container">
@@ -72,21 +68,21 @@ export default function SessionDetailPage() {
           <h1>{session.title}</h1>
           <p className="session-date">{session.date}</p>
         </div>
-        <Link to="/sessions" className="back-link">← Tillbaka</Link>
+        <Link to="/sessions" className="back-link">← Back</Link>
       </div>
 
-      <h2>Övningar</h2>
+      <h2>Exercises</h2>
 
       {session.exercises.length === 0 ? (
-        <p className="empty-message">Inga övningar än. Lägg till den första nedan!</p>
+        <p className="empty-message">No exercises yet. Add the first one below!</p>
       ) : (
         <table className="exercises-table">
           <thead>
             <tr>
-              <th>Övning</th>
+              <th>Exercise</th>
               <th>Sets</th>
               <th>Reps</th>
-              <th>Vikt (kg)</th>
+              <th>Weight (kg)</th>
             </tr>
           </thead>
           <tbody>
@@ -103,17 +99,17 @@ export default function SessionDetailPage() {
       )}
 
       <div className="add-exercise-form">
-        <h2>Lägg till övning</h2>
+        <h2>Add exercise</h2>
         <form onSubmit={handleAddExercise}>
           <div className="exercise-form-grid">
             <div className="form-group">
-              <label htmlFor="name">Övning:</label>
+              <label htmlFor="name">Exercise:</label>
               <input
                 type="text"
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="T.ex. Bänkpress"
+                placeholder="E.g. Bench press"
                 required
               />
             </div>
@@ -140,7 +136,7 @@ export default function SessionDetailPage() {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="weight">Vikt (kg, valfritt):</label>
+              <label htmlFor="weight">Weight (kg, optional):</label>
               <input
                 type="number"
                 id="weight"
@@ -153,7 +149,7 @@ export default function SessionDetailPage() {
           </div>
           {formError && <p className="error-message">{formError}</p>}
           <button type="submit" className="submit-button" disabled={addingExercise}>
-            {addingExercise ? 'Lägger till...' : 'Lägg till övning'}
+            {addingExercise ? 'Adding...' : 'Add exercise'}
           </button>
         </form>
       </div>

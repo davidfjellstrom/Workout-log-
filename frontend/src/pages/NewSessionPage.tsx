@@ -4,7 +4,7 @@ import { createSession } from '../services/api';
 
 export default function NewSessionPage() {
   const [title, setTitle] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Dagens datum som default
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -16,9 +16,9 @@ export default function NewSessionPage() {
 
     try {
       const newSession = await createSession({ title, date });
-      navigate(`/sessions/${newSession.id}`); // Gå direkt till det nya passet
+      navigate(`/sessions/${newSession.id}`);
     } catch {
-      setError('Kunde inte skapa träningspasset');
+      setError('Could not create workout');
     } finally {
       setLoading(false);
     }
@@ -27,21 +27,21 @@ export default function NewSessionPage() {
   return (
     <div className="page-container">
       <div className="form-wrapper">
-        <h1>Nytt träningspass</h1>
+        <h1>New workout</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="title">Titel:</label>
+            <label htmlFor="title">Title:</label>
             <input
               type="text"
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="T.ex. Bröst & triceps"
+              placeholder="E.g. Chest & triceps"
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="date">Datum:</label>
+            <label htmlFor="date">Date:</label>
             <input
               type="date"
               id="date"
@@ -52,7 +52,7 @@ export default function NewSessionPage() {
           </div>
           {error && <p className="error-message">{error}</p>}
           <button type="submit" className="submit-button" disabled={loading}>
-            {loading ? 'Skapar...' : 'Skapa pass'}
+            {loading ? 'Creating...' : 'Create workout'}
           </button>
         </form>
       </div>

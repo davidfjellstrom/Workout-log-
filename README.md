@@ -1,6 +1,6 @@
-# Träningsdagbok
+# Workout Log
 
-En webbapp för att logga träningspass och övningar. Registrera ett konto, skapa pass och lägg till övningar med sets, reps och vikt.
+A web app for logging workouts and exercises. Create an account, log your sessions and track sets, reps and weight.
 
 ## Teknikstack
 

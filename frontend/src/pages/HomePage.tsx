@@ -8,19 +8,19 @@ export default function HomePage() {
   return (
     <div className="page-container">
       <div className="home-content">
-        <h1>Välkommen till Träningsdagboken</h1>
+        <h1>Welcome to Workout Log</h1>
 
         {user ? (
           <div className="logged-in">
-            <p>Du är inloggad som <strong>{user.username}</strong>.</p>
-            <Link to="/sessions" className="cta-button">Visa mina träningspass</Link>
+            <p>You are logged in as <strong>{user.username}</strong>.</p>
+            <Link to="/sessions" className="cta-button">View my workouts</Link>
           </div>
         ) : (
           <div className="logged-out">
-            <p>Logga in eller skapa ett konto för att börja logga dina träningspass.</p>
+            <p>Log in or create an account to start tracking your workouts.</p>
             <div className="cta-links">
-              <Link to="/login" className="cta-button">Logga in</Link>
-              <Link to="/register" className="cta-button secondary">Skapa konto</Link>
+              <Link to="/login" className="cta-button">Log in</Link>
+              <Link to="/register" className="cta-button secondary">Create account</Link>
             </div>
           </div>
         )}

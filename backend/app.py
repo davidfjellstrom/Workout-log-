@@ -31,8 +31,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Träningsdagbok API",
-    description="Backend för träningsdagboken — hanterar användare, träningspass och övningar",
+    title="Workout Log API",
+    description="Backend for Workout Log — manages users, workout sessions and exercises",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -54,7 +54,7 @@ app.include_router(exercises_router)
 @app.get("/")
 async def root():
     return {
-        "message": "Välkommen till Träningsdagbok API!",
+        "message": "Welcome to Workout Log API!",
         "docs": "/docs",
         "endpoints": {
             "POST /users": "Registrera konto",

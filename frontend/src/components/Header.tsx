@@ -9,19 +9,19 @@ export default function Header() {
     <header className="header">
       <div className="header-container">
         <Link to="/" className="logo">
-          <h1>Träningsdagbok</h1>
+          <h1>Workout Log</h1>
         </Link>
         <nav className="nav">
           {user ? (
             <>
-              <span className="welcome">Hej, {user.username}!</span>
-              <Link to="/sessions" className="nav-link">Mina pass</Link>
-              <button onClick={logout} className="nav-button">Logga ut</button>
+              <span className="welcome">Hey, {user.username}!</span>
+              <Link to="/sessions" className="nav-link">My Workouts</Link>
+              <button onClick={logout} className="nav-button">Log out</button>
             </>
           ) : (
             <>
-              <Link to="/register" className="nav-link">Registrera</Link>
-              <Link to="/login" className="nav-link">Logga in</Link>
+              <Link to="/register" className="nav-link">Register</Link>
+              <Link to="/login" className="nav-link">Log in</Link>
             </>
           )}
         </nav>
