@@ -1,0 +1,108 @@
+.sessions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.sessions-header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.new-session-button {
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.new-session-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.empty-message {
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 4rem;
+  font-size: 1rem;
+}
+
+.sessions-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.session-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.15s, background 0.2s;
+}
+
+.session-card:hover {
+  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.2);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.session-link {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  text-decoration: none;
+  color: #f1f5f9;
+}
+
+.session-title {
+  font-weight: 600;
+  flex: 1;
+  font-size: 1rem;
+}
+
+.session-date {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+.session-count {
+  background: #ede9fe;
+  color: #7c3aed;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.delete-button {
+  padding: 1.1rem 1.1rem;
+  background: none;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f87171;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.delete-button:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
