@@ -2,6 +2,8 @@
 
 A web app for logging workouts and exercises. Create an account, log your sessions and track sets, reps and weight.
 
+**Live app:** https://workoutlog-frontend-one.vercel.app
+
 ## Tech stack
 
 | Layer | Technology |
