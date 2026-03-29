@@ -163,6 +163,11 @@ export default function SessionDetailPage() {
                 min="1"
                 required
               />
+              <div className="preset-chips">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button key={n} type="button" className={`preset-chip${sets === String(n) ? ' active' : ''}`} onClick={() => setSets(String(n))}>{n}</button>
+                ))}
+              </div>
             </div>
             <div className="form-group">
               <label htmlFor="reps">Reps:</label>
@@ -174,6 +179,11 @@ export default function SessionDetailPage() {
                 min="1"
                 required
               />
+              <div className="preset-chips">
+                {[5, 8, 10, 12, 15].map((n) => (
+                  <button key={n} type="button" className={`preset-chip${reps === String(n) ? ' active' : ''}`} onClick={() => setReps(String(n))}>{n}</button>
+                ))}
+              </div>
             </div>
             <div className="form-group">
               <label htmlFor="weight">Weight (kg, optional):</label>
@@ -185,6 +195,11 @@ export default function SessionDetailPage() {
                 min="0"
                 step="0.5"
               />
+              <div className="preset-chips">
+                {[10, 20, 30, 40, 60, 80, 100].map((n) => (
+                  <button key={n} type="button" className={`preset-chip${weightKg === String(n) ? ' active' : ''}`} onClick={() => setWeightKg(String(n))}>{n}</button>
+                ))}
+              </div>
             </div>
           </div>
           {formError && <p className="error-message">{formError}</p>}
