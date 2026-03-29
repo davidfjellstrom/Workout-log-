@@ -16,6 +16,7 @@ export default function Header() {
             <>
               <span className="welcome">Hey, {user.username}!</span>
               <Link to="/sessions" className="nav-link">My Workouts</Link>
+              <Link to="/stats" className="nav-link">Stats</Link>
               <button onClick={logout} className="nav-button">Log out</button>
             </>
           ) : (
