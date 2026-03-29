@@ -1,9 +1,15 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getSessions } from '../services/api';
 import './HomePage.css';
 
 export default function HomePage() {
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (user) getSessions();
+  }, [user]);
 
   return (
     <div className="page-container">

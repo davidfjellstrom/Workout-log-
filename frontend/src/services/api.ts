@@ -34,8 +34,19 @@ export async function getMe(): Promise<LoginResponse> {
 
 // --- Träningspass ---
 
+let sessionsCache: SessionListItem[] | null = null;
+
+export function getCachedSessions(): SessionListItem[] | null {
+  return sessionsCache;
+}
+
+export function clearSessionsCache() {
+  sessionsCache = null;
+}
+
 export async function getSessions(): Promise<SessionListItem[]> {
   const response = await api.get('/sessions/');
+  sessionsCache = response.data;
   return response.data;
 }
 

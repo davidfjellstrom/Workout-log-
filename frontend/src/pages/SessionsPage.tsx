@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getSessions, deleteSession } from '../services/api';
+import { getSessions, deleteSession, getCachedSessions } from '../services/api';
 import { SessionListItem } from '../types/session';
 import './SessionsPage.css';
 
@@ -23,9 +23,10 @@ function groupSessions(sessions: SessionListItem[]): Group[] {
 }
 
 export default function SessionsPage() {
-  const [sessions, setSessions] = useState<SessionListItem[]>([]);
+  const cached = getCachedSessions();
+  const [sessions, setSessions] = useState<SessionListItem[]>(cached ?? []);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(cached === null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   useEffect(() => {
