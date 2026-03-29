@@ -1,4 +1,16 @@
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .sessions-header {
+  animation: fadeSlideIn 0.4s ease both;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,6 +54,8 @@
 }
 
 .session-card {
+  animation: fadeSlideIn 0.4s ease both;
+  animation-delay: calc(var(--card-index, 0) * 80ms + 100ms);
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.08);
