@@ -55,6 +55,11 @@ export async function addExercise(sessionId: number, data: CreateExerciseRequest
   return response.data;
 }
 
+export async function getExerciseNames(): Promise<string[]> {
+  const response = await api.get('/sessions/exercise-names');
+  return response.data;
+}
+
 // --- Statistik ---
 
 export async function getStats() {

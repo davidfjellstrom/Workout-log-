@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getSession, addExercise } from '../services/api';
+import { getSession, addExercise, getExerciseNames } from '../services/api';
 import { Session } from '../types/session';
 import { Exercise } from '../types/exercise';
 import './SessionDetailPage.css';
@@ -16,6 +16,7 @@ export default function SessionDetailPage() {
   const [weightKg, setWeightKg] = useState('');
   const [formError, setFormError] = useState('');
   const [addingExercise, setAddingExercise] = useState(false);
+  const [exerciseNames, setExerciseNames] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -27,7 +28,17 @@ export default function SessionDetailPage() {
       }
     };
 
+    const fetchExerciseNames = async () => {
+      try {
+        const names = await getExerciseNames();
+        setExerciseNames(names);
+      } catch {
+        // Non-critical, ignore
+      }
+    };
+
     fetchSession();
+    fetchExerciseNames();
   }, [id]);
 
   const handleAddExercise = async (e: React.FormEvent) => {
@@ -110,8 +121,14 @@ export default function SessionDetailPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="E.g. Bench press"
+                list="exercise-suggestions"
                 required
               />
+              <datalist id="exercise-suggestions">
+                {exerciseNames.map((n) => (
+                  <option key={n} value={n} />
+                ))}
+              </datalist>
             </div>
             <div className="form-group">
               <label htmlFor="sets">Sets:</label>
