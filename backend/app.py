@@ -48,8 +48,8 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(users_router)
-app.include_router(sessions_router)
 app.include_router(exercises_router)
+app.include_router(sessions_router)
 app.include_router(stats_router)
 
 
