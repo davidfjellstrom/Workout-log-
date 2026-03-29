@@ -27,6 +27,11 @@ export async function logout(): Promise<void> {
   await api.post('/auth/logout');
 }
 
+export async function getMe(): Promise<LoginResponse> {
+  const response = await api.get('/auth/me');
+  return response.data;
+}
+
 // --- Träningspass ---
 
 export async function getSessions(): Promise<SessionListItem[]> {
