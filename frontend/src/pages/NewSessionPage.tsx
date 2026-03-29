@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createSession } from '../services/api';
+import { createSession, getSessions } from '../services/api';
 
 export default function NewSessionPage() {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sessionTitles, setSessionTitles] = useState<string[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getSessions()
+      .then((sessions) => {
+        const unique = [...new Set(sessions.map((s) => s.title))];
+        setSessionTitles(unique);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,8 +47,14 @@ export default function NewSessionPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="E.g. Chest & triceps"
+              list="title-suggestions"
               required
             />
+            <datalist id="title-suggestions">
+              {sessionTitles.map((t) => (
+                <option key={t} value={t} />
+              ))}
+            </datalist>
           </div>
           <div className="form-group">
             <label htmlFor="date">Date:</label>
