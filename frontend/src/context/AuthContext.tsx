@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import * as authService from '../services/api';
+import { useInactivityLogout } from '../hooks/useInactivityLogout';
 
 interface User {
   user_id: number;
@@ -32,10 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({ user_id: data.user_id, username: data.username });
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     authService.logout();
     setUser(null);
-  };
+  }, []);
+
+  useInactivityLogout(logout, !!user);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>
