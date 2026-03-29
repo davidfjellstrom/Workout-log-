@@ -263,7 +263,7 @@ export default function StatsPage() {
                 <Tooltip
                   contentStyle={tooltipStyle}
                   labelStyle={tooltipLabelStyle}
-                  formatter={(value: number) => [`${value} kg`, 'Max weight']}
+                  formatter={(value) => [`${value} kg`, 'Max weight']}
                 />
                 <Line
                   type="monotone"
