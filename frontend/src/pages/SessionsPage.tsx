@@ -48,8 +48,8 @@ export default function SessionsPage() {
         <p className="empty-message">No workouts yet. Create your first one!</p>
       ) : (
         <ul className="sessions-list">
-          {sessions.map((session) => (
-            <li key={session.id} className="session-card">
+          {sessions.map((session, i) => (
+            <li key={session.id} className="session-card" style={{ '--card-index': i } as React.CSSProperties}>
               <Link to={`/sessions/${session.id}`} className="session-link">
                 <span className="session-title">{session.title}</span>
                 <span className="session-date">{session.date}</span>
