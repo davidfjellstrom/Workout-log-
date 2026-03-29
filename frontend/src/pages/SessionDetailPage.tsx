@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getSession, addExercise, getExerciseNames } from '../services/api';
 import { Session } from '../types/session';
@@ -17,6 +17,8 @@ export default function SessionDetailPage() {
   const [formError, setFormError] = useState('');
   const [addingExercise, setAddingExercise] = useState(false);
   const [exerciseNames, setExerciseNames] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const autocompleteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchSession = async () => {
@@ -39,6 +41,14 @@ export default function SessionDetailPage() {
 
     fetchSession();
     fetchExerciseNames();
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (autocompleteRef.current && !autocompleteRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [id]);
 
   const handleAddExercise = async (e: React.FormEvent) => {
@@ -113,22 +123,35 @@ export default function SessionDetailPage() {
         <h2>Add exercise</h2>
         <form onSubmit={handleAddExercise}>
           <div className="exercise-form-grid">
-            <div className="form-group">
+            <div className="form-group" ref={autocompleteRef} style={{ position: 'relative' }}>
               <label htmlFor="name">Exercise:</label>
               <input
                 type="text"
                 id="name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => { setName(e.target.value); setShowSuggestions(true); }}
+                onFocus={() => setShowSuggestions(true)}
                 placeholder="E.g. Bench press"
-                list="exercise-suggestions"
+                autoComplete="off"
                 required
               />
-              <datalist id="exercise-suggestions">
-                {exerciseNames.map((n) => (
-                  <option key={n} value={n} />
-                ))}
-              </datalist>
+              {showSuggestions && exerciseNames.filter((n) =>
+                n.toLowerCase().includes(name.toLowerCase())
+              ).length > 0 && (
+                <ul className="autocomplete-list">
+                  {exerciseNames
+                    .filter((n) => n.toLowerCase().includes(name.toLowerCase()))
+                    .map((n) => (
+                      <li
+                        key={n}
+                        className="autocomplete-item"
+                        onMouseDown={() => { setName(n); setShowSuggestions(false); }}
+                      >
+                        {n}
+                      </li>
+                    ))}
+                </ul>
+              )}
             </div>
             <div className="form-group">
               <label htmlFor="sets">Sets:</label>
