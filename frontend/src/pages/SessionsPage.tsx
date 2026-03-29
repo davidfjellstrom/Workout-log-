@@ -7,6 +7,7 @@ import './SessionsPage.css';
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<SessionListItem[]>([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -15,6 +16,8 @@ export default function SessionsPage() {
         setSessions(data);
       } catch {
         setError('Could not load workouts');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -41,7 +44,7 @@ export default function SessionsPage() {
 
       {error && <p className="error-message">{error}</p>}
 
-      {sessions.length === 0 ? (
+      {loading ? null : sessions.length === 0 ? (
         <p className="empty-message">No workouts yet. Create your first one!</p>
       ) : (
         <ul className="sessions-list">
