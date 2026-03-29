@@ -3,7 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { getSession, addExercise, getExerciseNames } from '../services/api';
 import { Session } from '../types/session';
 import { Exercise } from '../types/exercise';
+import ScrollPicker from '../components/ScrollPicker';
 import './SessionDetailPage.css';
+
+const SETS_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const REPS_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 25, 30];
+const WEIGHT_OPTIONS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 140, 160];
 
 export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -154,52 +159,16 @@ export default function SessionDetailPage() {
               )}
             </div>
             <div className="form-group">
-              <label htmlFor="sets">Sets:</label>
-              <input
-                type="number"
-                id="sets"
-                value={sets}
-                onChange={(e) => setSets(e.target.value)}
-                min="1"
-                required
-              />
-              <div className="preset-chips">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <button key={n} type="button" className={`preset-chip${sets === String(n) ? ' active' : ''}`} onClick={() => setSets(String(n))}>{n}</button>
-                ))}
-              </div>
+              <label>Sets:</label>
+              <ScrollPicker value={sets} onChange={setSets} options={SETS_OPTIONS} required />
             </div>
             <div className="form-group">
-              <label htmlFor="reps">Reps:</label>
-              <input
-                type="number"
-                id="reps"
-                value={reps}
-                onChange={(e) => setReps(e.target.value)}
-                min="1"
-                required
-              />
-              <div className="preset-chips">
-                {[5, 8, 10, 12, 15].map((n) => (
-                  <button key={n} type="button" className={`preset-chip${reps === String(n) ? ' active' : ''}`} onClick={() => setReps(String(n))}>{n}</button>
-                ))}
-              </div>
+              <label>Reps:</label>
+              <ScrollPicker value={reps} onChange={setReps} options={REPS_OPTIONS} required />
             </div>
             <div className="form-group">
-              <label htmlFor="weight">Weight (kg, optional):</label>
-              <input
-                type="number"
-                id="weight"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
-                min="0"
-                step="0.5"
-              />
-              <div className="preset-chips">
-                {[10, 20, 30, 40, 60, 80, 100].map((n) => (
-                  <button key={n} type="button" className={`preset-chip${weightKg === String(n) ? ' active' : ''}`} onClick={() => setWeightKg(String(n))}>{n}</button>
-                ))}
-              </div>
+              <label>Weight (kg, optional):</label>
+              <ScrollPicker value={weightKg} onChange={setWeightKg} options={WEIGHT_OPTIONS} />
             </div>
           </div>
           {formError && <p className="error-message">{formError}</p>}

@@ -1,0 +1,62 @@
+.scroll-picker-wrapper {
+  position: relative;
+}
+
+.scroll-picker-input {
+  cursor: pointer;
+  caret-color: transparent;
+  user-select: none;
+}
+
+.scroll-picker-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  z-index: 200;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-picker-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scroll-picker-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-picker-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.scroll-picker-item {
+  scroll-snap-align: center;
+  padding: 0.6rem 0.9rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, color 0.15s;
+}
+
+.scroll-picker-item:hover {
+  background: rgba(99, 102, 241, 0.15);
+  color: #e2e8f0;
+}
+
+.scroll-picker-item.selected {
+  background: rgba(99, 102, 241, 0.25);
+  color: #c7d2fe;
+  font-weight: 600;
+}
