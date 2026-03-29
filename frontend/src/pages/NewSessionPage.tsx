@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createSession, getSessions } from '../services/api';
+import './NewSessionPage.css';
 
 export default function NewSessionPage() {
   const [title, setTitle] = useState('');
@@ -8,6 +9,8 @@ export default function NewSessionPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [sessionTitles, setSessionTitles] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,6 +21,20 @@ export default function NewSessionPage() {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filtered = title
+    ? sessionTitles.filter((t) => t.toLowerCase().includes(title.toLowerCase()))
+    : sessionTitles;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,22 +56,31 @@ export default function NewSessionPage() {
       <div className="form-wrapper">
         <h1>New workout</h1>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className="form-group" ref={wrapperRef} style={{ position: 'relative' }}>
             <label htmlFor="title">Title:</label>
             <input
               type="text"
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => { setTitle(e.target.value); setShowSuggestions(true); }}
+              onFocus={() => setShowSuggestions(true)}
               placeholder="E.g. Chest & triceps"
-              list="title-suggestions"
+              autoComplete="off"
               required
             />
-            <datalist id="title-suggestions">
-              {sessionTitles.map((t) => (
-                <option key={t} value={t} />
-              ))}
-            </datalist>
+            {showSuggestions && filtered.length > 0 && (
+              <ul className="autocomplete-list">
+                {filtered.map((t) => (
+                  <li
+                    key={t}
+                    className="autocomplete-item"
+                    onMouseDown={() => { setTitle(t); setShowSuggestions(false); }}
+                  >
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="date">Date:</label>
