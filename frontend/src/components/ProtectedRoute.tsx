@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
 
-  if (loading) return null;
+  if (loading) return <div style={{ minHeight: '100vh', background: '#0f172a' }} />;
 
   if (!user) {
     return <Navigate to="/login" replace />;
