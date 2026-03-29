@@ -54,3 +54,10 @@ export async function addExercise(sessionId: number, data: CreateExerciseRequest
   const response = await api.post(`/sessions/${sessionId}/exercises`, data);
   return response.data;
 }
+
+// --- Statistik ---
+
+export async function getStats() {
+  const res = await api.get('/stats/');
+  return res.data;
+}

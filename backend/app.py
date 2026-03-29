@@ -8,6 +8,7 @@ from routes.users import router as users_router
 from routes.auth import router as auth_router
 from routes.sessions import router as sessions_router
 from routes.exercises import router as exercises_router
+from routes.stats import router as stats_router
 from config.database import init_db
 
 load_dotenv()
@@ -49,6 +50,7 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(sessions_router)
 app.include_router(exercises_router)
+app.include_router(stats_router)
 
 
 @app.get("/")
