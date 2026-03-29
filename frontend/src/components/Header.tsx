@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import './Header.css';
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   return (
     <header className="header">
@@ -12,7 +12,7 @@ export default function Header() {
           <h1>Workout Log</h1>
         </Link>
         <nav className="nav">
-          {user ? (
+          {loading ? null : user ? (
             <>
               <span className="welcome">Hey, {user.username}!</span>
               <Link to="/sessions" className="nav-link">My Workouts</Link>
