@@ -72,7 +72,21 @@ async def get_stats(
     )
 
     top_exercises = [{"name": row.name, "count": row.count} for row in top_exercises_query]
-    top_exercise_names = [row["name"] for row in top_exercises]
+
+    # Only include exercises that track weight (have ever had a non-null weight_kg)
+    # in the progression section
+    weight_tracking_names_query = (
+        db.query(Exercise.name)
+        .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
+        .filter(
+            WorkoutSession.user_id == current_user.user_id,
+            Exercise.weight_kg.isnot(None)
+        )
+        .group_by(Exercise.name)
+        .all()
+    )
+    weight_tracking_names = {row.name for row in weight_tracking_names_query}
+    top_exercise_names = [row["name"] for row in top_exercises if row["name"] in weight_tracking_names]
 
     # --- exercise_progression: max weight per date for each top exercise ---
     exercise_progression: dict[str, list] = {}

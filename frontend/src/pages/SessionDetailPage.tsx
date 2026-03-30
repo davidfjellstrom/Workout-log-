@@ -65,9 +65,9 @@ export default function SessionDetailPage() {
     try {
       const newExercise: Exercise = await addExercise(Number(id), {
         name,
-        sets: Number(sets),
-        reps: Number(reps),
-        weight_kg: weightKg ? Number(weightKg) : undefined,
+        sets: tracksWeight ? Number(sets) : 1,
+        reps: tracksWeight ? Number(reps) : 1,
+        weight_kg: tracksWeight && weightKg ? Number(weightKg) : undefined,
       });
 
       setSession((prev) =>
@@ -171,19 +171,21 @@ export default function SessionDetailPage() {
                 </ul>
               )}
             </div>
-            <div className="form-group">
-              <label>Sets:</label>
-              <ScrollPicker value={sets} onChange={setSets} options={SETS_OPTIONS} required />
-            </div>
-            <div className="form-group">
-              <label>Reps:</label>
-              <ScrollPicker value={reps} onChange={setReps} options={REPS_OPTIONS} required />
-            </div>
             {tracksWeight && (
-              <div className="form-group">
-                <label>Weight (kg, optional):</label>
-                <ScrollPicker value={weightKg} onChange={setWeightKg} options={WEIGHT_OPTIONS} />
-              </div>
+              <>
+                <div className="form-group">
+                  <label>Sets:</label>
+                  <ScrollPicker value={sets} onChange={setSets} options={SETS_OPTIONS} required />
+                </div>
+                <div className="form-group">
+                  <label>Reps:</label>
+                  <ScrollPicker value={reps} onChange={setReps} options={REPS_OPTIONS} required />
+                </div>
+                <div className="form-group">
+                  <label>Weight (kg, optional):</label>
+                  <ScrollPicker value={weightKg} onChange={setWeightKg} options={WEIGHT_OPTIONS} />
+                </div>
+              </>
             )}
           </div>
           {formError && <p className="error-message">{formError}</p>}

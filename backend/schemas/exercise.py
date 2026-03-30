@@ -5,8 +5,8 @@ from typing import Optional
 class ExerciseCreate(BaseModel):
     """Schema för att lägga till en övning på ett pass."""
     name: str = Field(..., min_length=1, max_length=100)
-    sets: int = Field(..., ge=1)
-    reps: int = Field(..., ge=1)
+    sets: int = Field(default=1, ge=1)
+    reps: int = Field(default=1, ge=1)
     weight_kg: Optional[float] = None
 
 
