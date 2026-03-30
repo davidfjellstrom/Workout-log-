@@ -49,6 +49,7 @@ export default function SessionsPage() {
     try {
       const newSession = await duplicateSession(id);
       setSessions((prev) => [newSession, ...prev]);
+      setModalSessionId(newSession.id);
     } catch {
       setError('Could not duplicate workout');
     }
