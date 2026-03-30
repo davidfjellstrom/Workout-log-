@@ -66,7 +66,9 @@ async def add_exercise(
         name=exercise_data.name,
         sets=exercise_data.sets,
         reps=exercise_data.reps,
-        weight_kg=exercise_data.weight_kg
+        weight_kg=exercise_data.weight_kg,
+        duration_minutes=exercise_data.duration_minutes,
+        intensity=exercise_data.intensity,
     )
 
     db.add(new_exercise)
