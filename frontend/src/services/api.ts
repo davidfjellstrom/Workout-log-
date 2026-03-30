@@ -64,6 +64,11 @@ export async function deleteSession(sessionId: number): Promise<void> {
   await api.delete(`/sessions/${sessionId}`);
 }
 
+export async function duplicateSession(sessionId: number): Promise<SessionListItem> {
+  const response = await api.post(`/sessions/${sessionId}/duplicate`);
+  return response.data;
+}
+
 export async function updateSession(sessionId: number, data: { title?: string; date?: string }): Promise<SessionListItem> {
   const response = await api.patch(`/sessions/${sessionId}`, data);
   return response.data;
