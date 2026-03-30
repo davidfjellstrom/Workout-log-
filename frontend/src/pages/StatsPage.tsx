@@ -115,59 +115,62 @@ export default function StatsPage() {
       </div>
 
       <div className="stats-grid">
-        {/* Workouts per week */}
+        {/* Duration & Intensitet */}
         <div className="stats-card">
-          <h2>Workouts per week</h2>
-          {stats && stats.sessions_per_week.length > 0 ? (
+          <div className="stats-card-header">
+            <h2>Duration & Intensitet</h2>
+            {stats && Object.keys(stats.volume_by_exercise).length > 0 && (
+              <CustomSelect
+                value={selectedVolumeExercise}
+                onChange={setSelectedVolumeExercise}
+                options={[
+                  { value: '__all__', label: 'Alla övningar' },
+                  ...Object.keys(stats.volume_by_exercise).map((n) => ({ value: n, label: n })),
+                ]}
+              />
+            )}
+          </div>
+          {stats && (() => {
+            const data = selectedVolumeExercise === '__all__'
+              ? stats.volume_per_week
+              : (stats.volume_by_exercise[selectedVolumeExercise] ?? []);
+            return data.some((w) => w.duration > 0 || w.avg_intensity != null);
+          })() ? (() => {
+            const rawData = selectedVolumeExercise === '__all__'
+              ? stats!.volume_per_week
+              : (stats!.volume_by_exercise[selectedVolumeExercise] ?? []);
+            const hasDuration = rawData.some((w) => w.duration > 0);
+            const chartData = rawData.map((w) => ({ ...w, week: w.week.split('-')[1] ?? w.week }));
+            return (
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart
-                data={stats.sessions_per_week}
-                margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="rgba(255,255,255,0.06)"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="week"
-                  tick={{ fill: '#94a3b8', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v: string) => {
-                    // Show only the "W10" part
-                    const parts = v.split('-');
-                    return parts[1] ?? v;
-                  }}
-                />
-                <YAxis
-                  allowDecimals={false}
-                  tick={{ fill: '#94a3b8', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
+              <ComposedChart data={chartData} margin={{ top: 4, right: 24, left: hasDuration ? -8 : -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                <XAxis dataKey="week" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
+                {hasDuration && <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} unit=" min" allowDecimals={false} />}
+                <YAxis yAxisId="right" orientation="right" domain={[0, 10]} tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={tooltipStyle}
                   labelStyle={tooltipLabelStyle}
                   cursor={{ fill: 'rgba(99,102,241,0.1)' }}
+                  formatter={(value, name) => {
+                    if (name === 'Duration') return Number(value) === 0 ? null : [`${value} min`, 'Duration'];
+                    if (value == null) return null;
+                    return [`${value}/10`, 'Snittintensitet'];
+                  }}
                 />
-                <Bar
-                  dataKey="count"
-                  name="Sessions"
-                  fill="url(#barGradient)"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={48}
-                />
+                {hasDuration && <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />}
+                <Line yAxisId="right" type="monotone" dataKey="avg_intensity" name="avg_intensity" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6 }} connectNulls />
                 <defs>
-                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#8b5cf6" />
                     <stop offset="100%" stopColor="#6366f1" />
                   </linearGradient>
                 </defs>
-              </BarChart>
+              </ComposedChart>
             </ResponsiveContainer>
-          ) : (
-            <p className="no-data-message">No session data available</p>
+            );
+          })() : (
+            <p className="no-data-message">Fyll i duration eller intensitet på dina övningar för att se data här.</p>
           )}
         </div>
 
@@ -292,62 +295,58 @@ export default function StatsPage() {
             </p>
           )}
         </div>
-        {/* Träningsvolym per vecka */}
+        {/* Workouts per week */}
         <div className="stats-card">
-          <div className="stats-card-header">
-            <h2>Träningsvolym per vecka</h2>
-            {stats && Object.keys(stats.volume_by_exercise).length > 0 && (
-              <CustomSelect
-                value={selectedVolumeExercise}
-                onChange={setSelectedVolumeExercise}
-                options={[
-                  { value: '__all__', label: 'Alla övningar' },
-                  ...Object.keys(stats.volume_by_exercise).map((n) => ({ value: n, label: n })),
-                ]}
-              />
-            )}
-          </div>
-          {stats && (() => {
-            const data = selectedVolumeExercise === '__all__'
-              ? stats.volume_per_week
-              : (stats.volume_by_exercise[selectedVolumeExercise] ?? []);
-            return data.some((w) => w.duration > 0 || w.avg_intensity != null);
-          })() ? (() => {
-            const rawData = selectedVolumeExercise === '__all__'
-              ? stats!.volume_per_week
-              : (stats!.volume_by_exercise[selectedVolumeExercise] ?? []);
-            const hasDuration = rawData.some((w) => w.duration > 0);
-            const chartData = rawData.map((w) => ({ ...w, week: w.week.split('-')[1] ?? w.week }));
-            return (
+          <h2>Workouts per week</h2>
+          {stats && stats.sessions_per_week.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
-              <ComposedChart data={chartData} margin={{ top: 4, right: 24, left: hasDuration ? -8 : -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                <XAxis dataKey="week" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
-                {hasDuration && <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} unit=" min" allowDecimals={false} />}
-                <YAxis yAxisId="right" orientation="right" domain={[0, 10]} tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <BarChart
+                data={stats.sessions_per_week}
+                margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(255,255,255,0.06)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="week"
+                  tick={{ fill: '#94a3b8', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(v: string) => {
+                    const parts = v.split('-');
+                    return parts[1] ?? v;
+                  }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fill: '#94a3b8', fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <Tooltip
                   contentStyle={tooltipStyle}
                   labelStyle={tooltipLabelStyle}
                   cursor={{ fill: 'rgba(99,102,241,0.1)' }}
-                  formatter={(value, name) => {
-                    if (name === 'Duration') return Number(value) === 0 ? null : [`${value} min`, 'Duration'];
-                    if (value == null) return null;
-                    return [`${value}/10`, 'Snittintensitet'];
-                  }}
                 />
-                {hasDuration && <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />}
-                <Line yAxisId="right" type="monotone" dataKey="avg_intensity" name="avg_intensity" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6 }} connectNulls />
+                <Bar
+                  dataKey="count"
+                  name="Sessions"
+                  fill="url(#barGradient)"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={48}
+                />
                 <defs>
-                  <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#8b5cf6" />
                     <stop offset="100%" stopColor="#6366f1" />
                   </linearGradient>
                 </defs>
-              </ComposedChart>
+              </BarChart>
             </ResponsiveContainer>
-            );
-          })() : (
-            <p className="no-data-message">Fyll i duration eller intensitet på dina övningar för att se data här.</p>
+          ) : (
+            <p className="no-data-message">No session data available</p>
           )}
         </div>
       </div>
