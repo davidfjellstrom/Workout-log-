@@ -37,10 +37,8 @@ async def get_stats(
     """
     today = date.today()
 
-    # --- sessions_per_week: last 8 weeks ---
-    # Find Monday of the current ISO week
+    # --- sessions_per_week: last 8 weeks (+ any future weeks with sessions) ---
     current_week_monday = today - timedelta(days=today.weekday())
-    # Go back 7 more weeks so we have 8 weeks total (oldest first)
     start_date = current_week_monday - timedelta(weeks=7)
 
     sessions = db.query(WorkoutSession).filter(
@@ -53,9 +51,14 @@ async def get_stats(
         label = _iso_week_label(session.date)
         week_counts[label] += 1
 
-    # Build ordered list for all 8 weeks, including zero-count weeks
+    # Extend end to cover any future sessions beyond current week
+    latest_session_date = max((s.date for s in sessions), default=today)
+    latest_week_monday = latest_session_date - timedelta(days=latest_session_date.weekday())
+    end_week_monday = max(current_week_monday, latest_week_monday)
+    num_weeks = (end_week_monday - start_date).days // 7 + 1
+
     sessions_per_week = []
-    for i in range(8):
+    for i in range(num_weeks):
         week_monday = start_date + timedelta(weeks=i)
         label = _iso_week_label(week_monday)
         sessions_per_week.append({"week": label, "count": week_counts.get(label, 0)})
@@ -139,7 +142,7 @@ async def get_stats(
             week_intensity_count[label] += 1
 
     volume_per_week = []
-    for i in range(8):
+    for i in range(num_weeks):
         week_monday = start_date + timedelta(weeks=i)
         label = _iso_week_label(week_monday)
         avg_intensity = round(week_intensity_sum[label] / week_intensity_count[label], 1) if week_intensity_count[label] > 0 else None
@@ -190,7 +193,7 @@ async def get_stats(
                 wi_sum[label] += float(row.avg_intensity)
                 wi_cnt[label] += 1
         weekly = []
-        for i in range(8):
+        for i in range(num_weeks):
             label = _iso_week_label(start_date + timedelta(weeks=i))
             avg_i = round(wi_sum[label] / wi_cnt[label], 1) if wi_cnt[label] > 0 else None
             weekly.append({"week": label, "duration": wd.get(label, 0), "avg_intensity": avg_i})
