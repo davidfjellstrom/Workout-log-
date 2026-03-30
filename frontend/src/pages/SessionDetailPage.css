@@ -135,6 +135,7 @@ h2 {
 .edit-btn {
   background: none;
   border: none;
+  outline: none;
   cursor: pointer;
   font-size: 0.9rem;
   padding: 0.2rem 0.4rem;
