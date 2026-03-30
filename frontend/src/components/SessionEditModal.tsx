@@ -6,6 +6,7 @@ import { SessionListItem } from '../types/session';
 import './SessionEditModal.css';
 
 const INTENSITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const DURATION_TICKS = [5, 15, 30, 45, 60, 75, 90, 105, 120];
 
 interface Props {
   sessionId: number;
@@ -136,7 +137,22 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
                               <label>Vikt<input className="modal-small-input" type="number" value={editFields.weight_kg} onChange={(e) => setEditFields((f) => ({ ...f, weight_kg: e.target.value }))} placeholder="—" /></label>
                             </>
                           ) : (
-                            <label>Duration<input className="modal-small-input" type="number" value={editFields.duration_minutes} onChange={(e) => setEditFields((f) => ({ ...f, duration_minutes: e.target.value }))} placeholder="—" /></label>
+                            <div className="modal-duration">
+                              <label>Duration: <span className="intensity-value">{editFields.duration_minutes ? `${editFields.duration_minutes}min` : '—'}</span></label>
+                              <input
+                                type="range"
+                                min={5}
+                                max={120}
+                                step={5}
+                                value={editFields.duration_minutes || 5}
+                                onChange={(e) => setEditFields((f) => ({ ...f, duration_minutes: e.target.value }))}
+                                className="intensity-slider"
+                                style={{ '--val': editFields.duration_minutes ? ((Number(editFields.duration_minutes) - 5) / 115 * 9 + 1) : 1 } as React.CSSProperties}
+                              />
+                              <div className="modal-duration-ticks">
+                                {DURATION_TICKS.map((n) => <span key={n}>{n}</span>)}
+                              </div>
+                            </div>
                           )}
                         </div>
                         <div className="modal-intensity">
