@@ -27,8 +27,7 @@ async def get_exercise_names(
     rows = (
         db.query(
             Exercise.name,
-            func.count(Exercise.id).label("total"),
-            func.sum(func.case((Exercise.weight_kg.isnot(None), 1), else_=0)).label("with_weight")
+            func.max(Exercise.weight_kg).label("max_weight")
         )
         .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
         .filter(WorkoutSession.user_id == current_user.user_id)
@@ -36,10 +35,7 @@ async def get_exercise_names(
         .order_by(func.count(Exercise.id).desc())
         .all()
     )
-    return [
-        {"name": row.name, "tracks_weight": row.total > 0 and (row.with_weight / row.total) > 0.5}
-        for row in rows
-    ]
+    return [{"name": row.name, "tracks_weight": row.max_weight is not None} for row in rows]
 
 
 @router.post("/{session_id}/exercises", response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)
