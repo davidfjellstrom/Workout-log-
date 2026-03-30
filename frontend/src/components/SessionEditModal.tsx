@@ -42,8 +42,11 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
         onClose();
       }, 2000);
     } catch (err: unknown) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      setSessionSaveError(detail ? `Fel: ${detail}` : 'Kunde inte spara. Försök igen.');
+      const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data?.detail;
+      const msg = Array.isArray(detail)
+        ? detail.map((d: { loc?: unknown[]; msg?: string }) => `${d.loc?.slice(-1)[0]}: ${d.msg}`).join(', ')
+        : typeof detail === 'string' ? detail : null;
+      setSessionSaveError(msg ? `Fel: ${msg}` : 'Kunde inte spara. Försök igen.');
       console.error('updateSession failed:', err);
     }
   };
