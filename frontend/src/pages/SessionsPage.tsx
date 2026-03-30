@@ -96,7 +96,7 @@ export default function SessionsPage() {
               <li key={key} className="session-card group-card" style={{ '--card-index': i } as React.CSSProperties}>
                 <button className="group-toggle" onClick={() => toggleGroup(key)}>
                   <span className="session-title">{group.title}</span>
-                  <span className="session-date">{latest.date}</span>
+                  {!isOpen && <span className="session-date">{latest.date}</span>}
                   <span className="session-count">{group.sessions.length} {group.sessions.length === 1 ? 'session' : 'sessions'}</span>
                   <span className={`group-chevron${isOpen ? ' open' : ''}`}>›</span>
                 </button>
