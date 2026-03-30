@@ -1,10 +1,12 @@
 import logging
+from datetime import date
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from typing import List
 from schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionListItem
 from schemas.auth import CurrentUser
 from models.session import WorkoutSession
+from models.exercise import Exercise
 from config.database import get_db
 from routes.auth import get_current_user
 
@@ -111,6 +113,50 @@ async def update_session(
         date=session.date,
         created_at=session.created_at,
         exercise_count=len(session.exercises)
+    )
+
+
+@router.post("/{session_id}/duplicate", response_model=SessionListItem, status_code=status.HTTP_201_CREATED)
+async def duplicate_session(
+    session_id: int,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user)
+):
+    original = db.query(WorkoutSession).filter(
+        WorkoutSession.id == session_id,
+        WorkoutSession.user_id == current_user.user_id
+    ).first()
+    if not original:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    new_session = WorkoutSession(
+        user_id=current_user.user_id,
+        title=original.title,
+        date=date.today(),
+    )
+    db.add(new_session)
+    db.flush()
+
+    for ex in original.exercises:
+        db.add(Exercise(
+            session_id=new_session.id,
+            name=ex.name,
+            is_cardio=ex.is_cardio,
+            sets=ex.sets,
+            reps=ex.reps,
+            weight_kg=ex.weight_kg,
+            duration_minutes=ex.duration_minutes,
+            intensity=ex.intensity,
+        ))
+
+    db.commit()
+    db.refresh(new_session)
+    return SessionListItem(
+        id=new_session.id,
+        title=new_session.title,
+        date=new_session.date,
+        created_at=new_session.created_at,
+        exercise_count=len(new_session.exercises),
     )
 
 

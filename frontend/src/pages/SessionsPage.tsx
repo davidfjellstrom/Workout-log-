@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getSessions, deleteSession, getCachedSessions } from '../services/api';
+import { getSessions, deleteSession, duplicateSession, getCachedSessions } from '../services/api';
 import { SessionListItem } from '../types/session';
 import SessionEditModal from '../components/SessionEditModal';
 import './SessionsPage.css';
@@ -44,6 +44,15 @@ export default function SessionsPage() {
     };
     fetchSessions();
   }, []);
+
+  const handleDuplicate = async (id: number) => {
+    try {
+      const newSession = await duplicateSession(id);
+      setSessions((prev) => [newSession, ...prev]);
+    } catch {
+      setError('Could not duplicate workout');
+    }
+  };
 
   const handleDelete = async (id: number, title: string) => {
     if (!confirm(`Delete workout "${title}"?`)) return;
@@ -99,6 +108,9 @@ export default function SessionsPage() {
                           <span className="session-date">{session.date}</span>
                           <span className="session-count">{session.exercise_count} exercises</span>
                         </Link>
+                        <button className="session-edit-btn" title="Duplicate workout" onClick={() => handleDuplicate(session.id)}>
+                          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
                         <button className="session-edit-btn" onClick={() => setModalSessionId(session.id)}>
                           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </button>
