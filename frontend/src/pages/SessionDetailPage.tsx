@@ -243,6 +243,20 @@ export default function SessionDetailPage() {
                 </ul>
               )}
             </div>
+          </div>
+          <div className="exercise-type-toggle">
+            <button
+              type="button"
+              className={`type-btn${tracksWeight ? ' active' : ''}`}
+              onClick={() => setTracksWeight(true)}
+            >Styrka</button>
+            <button
+              type="button"
+              className={`type-btn${!tracksWeight ? ' active' : ''}`}
+              onClick={() => setTracksWeight(false)}
+            >Cardio / Sport</button>
+          </div>
+          <div className="exercise-form-grid" style={{ marginTop: '1rem' }}>
             {tracksWeight && (
               <>
                 <div className="form-group">
