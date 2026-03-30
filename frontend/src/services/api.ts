@@ -71,7 +71,12 @@ export async function addExercise(sessionId: number, data: CreateExerciseRequest
   return response.data;
 }
 
-export async function getExerciseNames(): Promise<string[]> {
+export interface ExerciseNameEntry {
+  name: string;
+  tracks_weight: boolean;
+}
+
+export async function getExerciseNames(): Promise<ExerciseNameEntry[]> {
   const response = await api.get('/sessions/exercise-names');
   return response.data;
 }

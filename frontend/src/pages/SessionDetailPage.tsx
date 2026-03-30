@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getSession, addExercise, getExerciseNames } from '../services/api';
+import { getSession, addExercise, getExerciseNames, ExerciseNameEntry } from '../services/api';
 import { Session } from '../types/session';
 import { Exercise } from '../types/exercise';
 import ScrollPicker from '../components/ScrollPicker';
@@ -21,8 +21,9 @@ export default function SessionDetailPage() {
   const [weightKg, setWeightKg] = useState('');
   const [formError, setFormError] = useState('');
   const [addingExercise, setAddingExercise] = useState(false);
-  const [exerciseNames, setExerciseNames] = useState<string[]>([]);
+  const [exerciseNames, setExerciseNames] = useState<ExerciseNameEntry[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [tracksWeight, setTracksWeight] = useState(true);
   const autocompleteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -134,25 +135,37 @@ export default function SessionDetailPage() {
                 type="text"
                 id="name"
                 value={name}
-                onChange={(e) => { setName(e.target.value); setShowSuggestions(true); }}
+                onChange={(e) => {
+  const val = e.target.value;
+  setName(val);
+  setShowSuggestions(true);
+  // If user clears or types a name not in the known list, default to showing weight
+  const match = exerciseNames.find((en) => en.name.toLowerCase() === val.toLowerCase());
+  setTracksWeight(match ? match.tracks_weight : true);
+}}
                 onFocus={() => setShowSuggestions(true)}
                 placeholder="E.g. Bench press"
                 autoComplete="off"
                 required
               />
-              {showSuggestions && exerciseNames.filter((n) =>
-                n.toLowerCase().includes(name.toLowerCase())
+              {showSuggestions && exerciseNames.filter((e) =>
+                e.name.toLowerCase().includes(name.toLowerCase())
               ).length > 0 && (
                 <ul className="autocomplete-list">
                   {exerciseNames
-                    .filter((n) => n.toLowerCase().includes(name.toLowerCase()))
-                    .map((n) => (
+                    .filter((e) => e.name.toLowerCase().includes(name.toLowerCase()))
+                    .map((e) => (
                       <li
-                        key={n}
+                        key={e.name}
                         className="autocomplete-item"
-                        onMouseDown={() => { setName(n); setShowSuggestions(false); }}
+                        onMouseDown={() => {
+                          setName(e.name);
+                          setTracksWeight(e.tracks_weight);
+                          if (!e.tracks_weight) setWeightKg('');
+                          setShowSuggestions(false);
+                        }}
                       >
-                        {n}
+                        {e.name}
                       </li>
                     ))}
                 </ul>
@@ -166,10 +179,12 @@ export default function SessionDetailPage() {
               <label>Reps:</label>
               <ScrollPicker value={reps} onChange={setReps} options={REPS_OPTIONS} required />
             </div>
-            <div className="form-group">
-              <label>Weight (kg, optional):</label>
-              <ScrollPicker value={weightKg} onChange={setWeightKg} options={WEIGHT_OPTIONS} />
-            </div>
+            {tracksWeight && (
+              <div className="form-group">
+                <label>Weight (kg, optional):</label>
+                <ScrollPicker value={weightKg} onChange={setWeightKg} options={WEIGHT_OPTIONS} />
+              </div>
+            )}
           </div>
           {formError && <p className="error-message">{formError}</p>}
           <button type="submit" className="submit-button" disabled={addingExercise}>
