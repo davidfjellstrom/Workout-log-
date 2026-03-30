@@ -131,7 +131,6 @@ export default function SessionsPage() {
           onClose={() => setModalSessionId(null)}
           onSaved={(updated) => {
             setSessions((prev) => prev.map((s) => s.id === updated.id ? updated : s));
-            setModalSessionId(null);
           }}
         />
       )}

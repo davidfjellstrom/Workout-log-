@@ -33,11 +33,12 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
   const handleSaveSession = async () => {
     try {
       const updated = await updateSession(sessionId, { title, date });
+      onSaved(updated);
       setSessionSaved(true);
       setTimeout(() => {
         setSessionSaved(false);
-        onSaved(updated);
-      }, 1500);
+        onClose();
+      }, 2000);
     } catch {
       // ignore
     }
