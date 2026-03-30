@@ -10,9 +10,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
-  Legend,
 } from 'recharts';
 import { getStats } from '../services/api';
+import CustomSelect from '../components/CustomSelect';
 import './StatsPage.css';
 
 interface WeekCount {
@@ -41,6 +41,7 @@ interface StatsData {
   top_exercises: ExerciseCount[];
   exercise_progression: Record<string, ProgressionPoint[]>;
   volume_per_week: VolumePoint[];
+  volume_by_exercise: Record<string, VolumePoint[]>;
 }
 
 // Custom tooltip style for recharts
@@ -62,6 +63,7 @@ export default function StatsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedExercise, setSelectedExercise] = useState('');
+  const [selectedVolumeExercise, setSelectedVolumeExercise] = useState('__all__');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -229,19 +231,13 @@ export default function StatsPage() {
           <div className="stats-card-header">
             <h2>Weight progression</h2>
             {stats && stats.top_exercises.length > 0 && (
-              <select
-                className="exercise-select"
+              <CustomSelect
                 value={selectedExercise}
-                onChange={(e) => setSelectedExercise(e.target.value)}
-              >
-                {stats.top_exercises
+                onChange={setSelectedExercise}
+                options={stats.top_exercises
                   .filter((ex) => (stats.exercise_progression[ex.name] ?? []).length > 0)
-                  .map((ex) => (
-                    <option key={ex.name} value={ex.name}>
-                      {ex.name}
-                    </option>
-                  ))}
-              </select>
+                  .map((ex) => ({ value: ex.name, label: ex.name }))}
+              />
             )}
           </div>
           {progressionData.length > 0 ? (
@@ -298,11 +294,31 @@ export default function StatsPage() {
         </div>
         {/* Träningsvolym per vecka */}
         <div className="stats-card">
-          <h2>Träningsvolym per vecka</h2>
-          {stats && stats.volume_per_week.some((w) => w.duration > 0 || w.avg_intensity != null) ? (
+          <div className="stats-card-header">
+            <h2>Träningsvolym per vecka</h2>
+            {stats && Object.keys(stats.volume_by_exercise).length > 0 && (
+              <CustomSelect
+                value={selectedVolumeExercise}
+                onChange={setSelectedVolumeExercise}
+                options={[
+                  { value: '__all__', label: 'Alla övningar' },
+                  ...Object.keys(stats.volume_by_exercise).map((n) => ({ value: n, label: n })),
+                ]}
+              />
+            )}
+          </div>
+          {stats && (() => {
+            const data = selectedVolumeExercise === '__all__'
+              ? stats.volume_per_week
+              : (stats.volume_by_exercise[selectedVolumeExercise] ?? []);
+            return data.some((w) => w.duration > 0 || w.avg_intensity != null);
+          })() ? (
             <ResponsiveContainer width="100%" height={220}>
               <ComposedChart
-                data={stats.volume_per_week.map((w) => ({
+                data={(selectedVolumeExercise === '__all__'
+                  ? stats!.volume_per_week
+                  : (stats!.volume_by_exercise[selectedVolumeExercise] ?? [])
+                ).map((w) => ({
                   ...w,
                   week: w.week.split('-')[1] ?? w.week,
                 }))}
@@ -321,10 +337,6 @@ export default function StatsPage() {
                     if (value == null) return null;
                     return [`${value}/10`, 'Snittintensitet'];
                   }}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '8px' }}
-                  formatter={(value) => value === 'Duration' ? 'Duration (min)' : 'Snittintensitet'}
                 />
                 <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />
                 <Line yAxisId="right" type="monotone" dataKey="avg_intensity" name="avg_intensity" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6 }} connectNulls />

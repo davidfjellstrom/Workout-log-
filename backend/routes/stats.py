@@ -3,7 +3,7 @@ from datetime import date, timedelta
 from collections import defaultdict
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from schemas.auth import CurrentUser
 from models.session import WorkoutSession
 from models.exercise import Exercise
@@ -149,9 +149,57 @@ async def get_stats(
             "avg_intensity": avg_intensity,
         })
 
+    # --- volume_by_exercise: per-exercise volume data ---
+    vol_exercise_names = [row.name for row in (
+        db.query(Exercise.name)
+        .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
+        .filter(
+            WorkoutSession.user_id == current_user.user_id,
+            WorkoutSession.date >= start_date,
+            or_(Exercise.duration_minutes.isnot(None), Exercise.intensity.isnot(None))
+        )
+        .distinct()
+        .all()
+    )]
+
+    volume_by_exercise: dict[str, list] = {}
+    for ex_name in vol_exercise_names:
+        ex_rows = (
+            db.query(
+                WorkoutSession.date,
+                func.sum(Exercise.duration_minutes).label("total_duration"),
+                func.avg(Exercise.intensity).label("avg_intensity"),
+            )
+            .join(Exercise, Exercise.session_id == WorkoutSession.id)
+            .filter(
+                WorkoutSession.user_id == current_user.user_id,
+                WorkoutSession.date >= start_date,
+                Exercise.name == ex_name,
+            )
+            .group_by(WorkoutSession.date)
+            .all()
+        )
+        wd: dict[str, int] = defaultdict(int)
+        wi_sum: dict[str, float] = defaultdict(float)
+        wi_cnt: dict[str, int] = defaultdict(int)
+        for row in ex_rows:
+            label = _iso_week_label(row.date)
+            if row.total_duration:
+                wd[label] += int(row.total_duration)
+            if row.avg_intensity is not None:
+                wi_sum[label] += float(row.avg_intensity)
+                wi_cnt[label] += 1
+        weekly = []
+        for i in range(8):
+            label = _iso_week_label(start_date + timedelta(weeks=i))
+            avg_i = round(wi_sum[label] / wi_cnt[label], 1) if wi_cnt[label] > 0 else None
+            weekly.append({"week": label, "duration": wd.get(label, 0), "avg_intensity": avg_i})
+        volume_by_exercise[ex_name] = weekly
+
     return {
         "sessions_per_week": sessions_per_week,
         "top_exercises": top_exercises,
         "exercise_progression": exercise_progression,
         "volume_per_week": volume_per_week,
+        "volume_by_exercise": volume_by_exercise,
     }
