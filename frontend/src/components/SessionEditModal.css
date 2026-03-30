@@ -241,6 +241,31 @@
   margin-bottom: 0.4rem;
 }
 
+.modal-duration {
+  width: 100%;
+  flex: 1 0 100%;
+}
+
+.modal-duration label {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.modal-duration-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  padding: 0 2px;
+}
+
+.modal-duration-ticks span {
+  font-size: 0.68rem;
+  color: #475569;
+  text-align: center;
+}
+
 .modal-exercise-actions {
   display: flex;
   gap: 0.5rem;
