@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import date, datetime
-from typing import List
+from typing import List, Optional
 from schemas.exercise import ExerciseResponse
 
 
@@ -8,6 +8,12 @@ class SessionCreate(BaseModel):
     """Schema för att skapa ett nytt träningspass."""
     title: str = Field(..., min_length=1, max_length=100)
     date: date
+
+
+class SessionUpdate(BaseModel):
+    """Schema för att uppdatera ett träningspass."""
+    title: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    date: Optional[date] = None
 
 
 class SessionListItem(BaseModel):

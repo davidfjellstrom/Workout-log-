@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from schemas.session import SessionCreate, SessionResponse, SessionListItem
+from schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionListItem
 from schemas.auth import CurrentUser
 from models.session import WorkoutSession
 from config.database import get_db
@@ -86,6 +86,32 @@ async def get_session(
         )
 
     return session
+
+
+@router.patch("/{session_id}", response_model=SessionListItem)
+async def update_session(
+    session_id: int,
+    session_data: SessionUpdate,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user)
+):
+    session = db.query(WorkoutSession).filter(
+        WorkoutSession.id == session_id,
+        WorkoutSession.user_id == current_user.user_id
+    ).first()
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+    for field, value in session_data.model_dump(exclude_unset=True).items():
+        setattr(session, field, value)
+    db.commit()
+    db.refresh(session)
+    return SessionListItem(
+        id=session.id,
+        title=session.title,
+        date=session.date,
+        created_at=session.created_at,
+        exercise_count=len(session.exercises)
+    )
 
 
 @router.delete("/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
