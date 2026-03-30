@@ -45,4 +45,15 @@ def init_db():
     from models.session import WorkoutSession  # noqa: F401
     from models.exercise import Exercise  # noqa: F401
     Base.metadata.create_all(bind=engine)
+
+    # Add new columns to existing tables if they don't exist yet
+    with engine.connect() as conn:
+        conn.execute(__import__('sqlalchemy').text(
+            "ALTER TABLE exercises ADD COLUMN IF NOT EXISTS duration_minutes INTEGER"
+        ))
+        conn.execute(__import__('sqlalchemy').text(
+            "ALTER TABLE exercises ADD COLUMN IF NOT EXISTS intensity INTEGER"
+        ))
+        conn.commit()
+
     logger.info("Database tables created/verified.")
