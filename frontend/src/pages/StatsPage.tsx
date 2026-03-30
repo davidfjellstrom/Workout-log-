@@ -156,7 +156,7 @@ export default function StatsPage() {
                   formatter={(value, name) => {
                     if (name === 'Duration') return Number(value) === 0 ? null : [`${value} min`, 'Duration'];
                     if (value == null) return null;
-                    return [`${value}/10`, 'Snittintensitet'];
+                    return [`${value}/10`, 'Intensitet'];
                   }}
                 />
                 {hasDuration && <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />}
