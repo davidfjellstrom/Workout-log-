@@ -8,6 +8,8 @@ class ExerciseCreate(BaseModel):
     sets: int = Field(default=1, ge=1)
     reps: int = Field(default=1, ge=1)
     weight_kg: Optional[float] = None
+    duration_minutes: Optional[int] = Field(default=None, ge=1)
+    intensity: Optional[int] = Field(default=None, ge=1, le=10)
 
 
 class ExerciseResponse(BaseModel):
@@ -18,6 +20,8 @@ class ExerciseResponse(BaseModel):
     sets: int
     reps: int
     weight_kg: Optional[float]
+    duration_minutes: Optional[int]
+    intensity: Optional[int]
 
     class Config:
         from_attributes = True

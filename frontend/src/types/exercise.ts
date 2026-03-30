@@ -5,6 +5,8 @@ export interface Exercise {
   sets: number;
   reps: number;
   weight_kg: number | null;
+  duration_minutes: number | null;
+  intensity: number | null;
 }
 
 export interface CreateExerciseRequest {
@@ -12,4 +14,6 @@ export interface CreateExerciseRequest {
   sets: number;
   reps: number;
   weight_kg?: number;
+  duration_minutes?: number;
+  intensity?: number;
 }

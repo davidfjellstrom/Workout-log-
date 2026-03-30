@@ -16,6 +16,8 @@ class Exercise(Base):
     sets = Column(Integer, nullable=False)
     reps = Column(Integer, nullable=False)
     weight_kg = Column(Float, nullable=True)  # Valfri vikt i kg
+    duration_minutes = Column(Integer, nullable=True)
+    intensity = Column(Integer, nullable=True)  # 1–10
 
     # Relation tillbaka till passet
     session = relationship("WorkoutSession", back_populates="exercises")

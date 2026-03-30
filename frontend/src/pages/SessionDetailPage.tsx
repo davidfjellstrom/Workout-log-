@@ -9,6 +9,8 @@ import './SessionDetailPage.css';
 const SETS_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const REPS_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 25, 30];
 const WEIGHT_OPTIONS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 140, 160];
+const DURATION_OPTIONS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 90, 105, 120];
+const INTENSITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +21,8 @@ export default function SessionDetailPage() {
   const [sets, setSets] = useState('');
   const [reps, setReps] = useState('');
   const [weightKg, setWeightKg] = useState('');
+  const [durationMinutes, setDurationMinutes] = useState('');
+  const [intensity, setIntensity] = useState('');
   const [formError, setFormError] = useState('');
   const [addingExercise, setAddingExercise] = useState(false);
   const [exerciseNames, setExerciseNames] = useState<ExerciseNameEntry[]>([]);
@@ -68,6 +72,8 @@ export default function SessionDetailPage() {
         sets: tracksWeight ? Number(sets) : 1,
         reps: tracksWeight ? Number(reps) : 1,
         weight_kg: tracksWeight && weightKg ? Number(weightKg) : undefined,
+        duration_minutes: durationMinutes ? Number(durationMinutes) : undefined,
+        intensity: intensity ? Number(intensity) : undefined,
       });
 
       setSession((prev) =>
@@ -78,6 +84,8 @@ export default function SessionDetailPage() {
       setSets('');
       setReps('');
       setWeightKg('');
+      setDurationMinutes('');
+      setIntensity('');
     } catch {
       setFormError('Could not add exercise');
     } finally {
@@ -110,6 +118,8 @@ export default function SessionDetailPage() {
               <th>Sets</th>
               <th>Reps</th>
               <th>Weight (kg)</th>
+              <th>Duration (min)</th>
+              <th>Intensitet</th>
             </tr>
           </thead>
           <tbody>
@@ -119,6 +129,8 @@ export default function SessionDetailPage() {
                 <td>{exercise.sets}</td>
                 <td>{exercise.reps}</td>
                 <td>{exercise.weight_kg ?? '—'}</td>
+                <td>{exercise.duration_minutes ?? '—'}</td>
+                <td>{exercise.intensity != null ? `${exercise.intensity}/10` : '—'}</td>
               </tr>
             ))}
           </tbody>
@@ -187,6 +199,14 @@ export default function SessionDetailPage() {
                 </div>
               </>
             )}
+            <div className="form-group">
+              <label>Duration (min):</label>
+              <ScrollPicker value={durationMinutes} onChange={setDurationMinutes} options={DURATION_OPTIONS} />
+            </div>
+            <div className="form-group">
+              <label>Intensitet (1–10):</label>
+              <ScrollPicker value={intensity} onChange={setIntensity} options={INTENSITY_OPTIONS} />
+            </div>
           </div>
           {formError && <p className="error-message">{formError}</p>}
           <button type="submit" className="submit-button" disabled={addingExercise}>
