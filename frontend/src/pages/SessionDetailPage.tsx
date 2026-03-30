@@ -145,7 +145,9 @@ export default function SessionDetailPage() {
           const hasDuration = session.exercises.some((e) => e.duration_minutes != null);
           const hasIntensity = session.exercises.some((e) => e.intensity != null);
           const hasWeight = session.exercises.some((e) => e.weight_kg != null);
-          const hasSetsReps = session.exercises.some((e) => e.sets != null || e.reps != null);
+          const hasSetsReps = session.exercises.some((e) =>
+            e.weight_kg != null || (e.sets != null && (e.sets > 1 || (e.reps != null && e.reps > 1)))
+          );
           return (
         <table className="exercises-table">
           <thead>
