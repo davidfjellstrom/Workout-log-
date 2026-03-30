@@ -318,6 +318,17 @@ h2 {
   text-align: center;
 }
 
+.duration-row {
+  margin-bottom: 1.25rem;
+}
+
+.duration-ticks span {
+  width: auto;
+  font-size: 0.72rem;
+  color: #475569;
+  text-align: center;
+}
+
 .submit-button {
   padding: 0.7rem 1.75rem;
   background: linear-gradient(135deg, #6366f1, #8b5cf6);

@@ -9,7 +9,6 @@ import './SessionDetailPage.css';
 const SETS_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const REPS_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 25, 30];
 const WEIGHT_OPTIONS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 110, 120, 140, 160];
-const DURATION_OPTIONS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 90, 105, 120];
 const INTENSITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 export default function SessionDetailPage() {
@@ -276,9 +275,25 @@ export default function SessionDetailPage() {
               </>
             )}
             {!tracksWeight && (
-              <div className="form-group">
-                <label>Duration (min):</label>
-                <ScrollPicker value={durationMinutes} onChange={setDurationMinutes} options={DURATION_OPTIONS} />
+              <div className="duration-row">
+                <label className="intensity-label">
+                  Duration: <span className="intensity-value">{durationMinutes ? `${durationMinutes} min` : '—'}</span>
+                </label>
+                <input
+                  type="range"
+                  min={5}
+                  max={120}
+                  step={5}
+                  value={durationMinutes || ''}
+                  onChange={(e) => setDurationMinutes(e.target.value)}
+                  className="intensity-slider"
+                  style={{ '--val': durationMinutes ? ((Number(durationMinutes) - 5) / 115 * 9 + 1) : 0 } as React.CSSProperties}
+                />
+                <div className="intensity-ticks duration-ticks">
+                  {[5, 30, 60, 90, 120].map((n) => (
+                    <span key={n}>{n}</span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
