@@ -312,21 +312,18 @@ export default function StatsPage() {
               ? stats.volume_per_week
               : (stats.volume_by_exercise[selectedVolumeExercise] ?? []);
             return data.some((w) => w.duration > 0 || w.avg_intensity != null);
-          })() ? (
+          })() ? (() => {
+            const rawData = selectedVolumeExercise === '__all__'
+              ? stats!.volume_per_week
+              : (stats!.volume_by_exercise[selectedVolumeExercise] ?? []);
+            const hasDuration = rawData.some((w) => w.duration > 0);
+            const chartData = rawData.map((w) => ({ ...w, week: w.week.split('-')[1] ?? w.week }));
+            return (
             <ResponsiveContainer width="100%" height={220}>
-              <ComposedChart
-                data={(selectedVolumeExercise === '__all__'
-                  ? stats!.volume_per_week
-                  : (stats!.volume_by_exercise[selectedVolumeExercise] ?? [])
-                ).map((w) => ({
-                  ...w,
-                  week: w.week.split('-')[1] ?? w.week,
-                }))}
-                margin={{ top: 4, right: 24, left: -8, bottom: 0 }}
-              >
+              <ComposedChart data={chartData} margin={{ top: 4, right: 24, left: hasDuration ? -8 : -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
                 <XAxis dataKey="week" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} unit=" min" allowDecimals={false} />
+                {hasDuration && <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} unit=" min" allowDecimals={false} />}
                 <YAxis yAxisId="right" orientation="right" domain={[0, 10]} tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip
                   contentStyle={tooltipStyle}
@@ -338,7 +335,7 @@ export default function StatsPage() {
                     return [`${value}/10`, 'Snittintensitet'];
                   }}
                 />
-                <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                {hasDuration && <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />}
                 <Line yAxisId="right" type="monotone" dataKey="avg_intensity" name="avg_intensity" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6 }} connectNulls />
                 <defs>
                   <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="1">
@@ -348,7 +345,8 @@ export default function StatsPage() {
                 </defs>
               </ComposedChart>
             </ResponsiveContainer>
-          ) : (
+            );
+          })() : (
             <p className="no-data-message">Fyll i duration eller intensitet på dina övningar för att se data här.</p>
           )}
         </div>
