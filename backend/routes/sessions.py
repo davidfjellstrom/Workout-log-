@@ -119,6 +119,7 @@ async def update_session(
 @router.post("/{session_id}/duplicate", response_model=SessionListItem, status_code=status.HTTP_201_CREATED)
 async def duplicate_session(
     session_id: int,
+    body: dict = {},
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(get_current_user)
 ):
@@ -129,10 +130,12 @@ async def duplicate_session(
     if not original:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
 
+    target_date = body.get("date") or date.today().isoformat()
+
     new_session = WorkoutSession(
         user_id=current_user.user_id,
         title=original.title,
-        date=date.today(),
+        date=target_date,
     )
     db.add(new_session)
     db.flush()

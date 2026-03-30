@@ -65,7 +65,8 @@ export async function deleteSession(sessionId: number): Promise<void> {
 }
 
 export async function duplicateSession(sessionId: number): Promise<SessionListItem> {
-  const response = await api.post(`/sessions/${sessionId}/duplicate`);
+  const today = new Date().toLocaleDateString('sv-SE'); // YYYY-MM-DD i lokal tidszon
+  const response = await api.post(`/sessions/${sessionId}/duplicate`, { date: today });
   return response.data;
 }
 
