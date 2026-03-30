@@ -118,10 +118,7 @@ export default function StatsPage() {
         {/* Duration & Intensitet */}
         <div className="stats-card">
           <div className="stats-card-header">
-            <div>
-              <h2>Duration & Intensitet</h2>
-              <span className="intensity-legend"><span className="intensity-legend-dot" />Intensitet</span>
-            </div>
+            <h2>Duration & Intensitet</h2>
             {stats && Object.keys(stats.volume_by_exercise).length > 0 && (
               <CustomSelect
                 value={selectedVolumeExercise}
@@ -145,6 +142,7 @@ export default function StatsPage() {
             const hasDuration = rawData.some((w) => w.duration > 0);
             const chartData = rawData.map((w) => ({ ...w, week: w.week.split('-')[1] ?? w.week }));
             return (
+            <>
             <ResponsiveContainer width="100%" height={220}>
               <ComposedChart data={chartData} margin={{ top: 4, right: 24, left: hasDuration ? -8 : -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -171,6 +169,11 @@ export default function StatsPage() {
                 </defs>
               </ComposedChart>
             </ResponsiveContainer>
+            <div className="chart-legend">
+              {hasDuration && <span className="chart-legend-item"><span className="chart-legend-bar" />Duration</span>}
+              <span className="chart-legend-item"><span className="chart-legend-dot" />Intensitet</span>
+            </div>
+            </>
             );
           })() : (
             <p className="no-data-message">Fyll i duration eller intensitet på dina övningar för att se data här.</p>

@@ -76,16 +76,30 @@
   margin: 0;
 }
 
-.intensity-legend {
+.chart-legend {
   display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.78rem;
-  color: #94a3b8;
-  margin-top: 0.25rem;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 0.75rem;
 }
 
-.intensity-legend-dot {
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.chart-legend-bar {
+  width: 12px;
+  height: 10px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #8b5cf6, #6366f1);
+  flex-shrink: 0;
+}
+
+.chart-legend-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
