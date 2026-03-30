@@ -118,7 +118,10 @@ export default function StatsPage() {
         {/* Duration & Intensitet */}
         <div className="stats-card">
           <div className="stats-card-header">
-            <h2>Duration & Intensitet</h2>
+            <div>
+              <h2>Duration & Intensitet</h2>
+              <span className="intensity-legend"><span className="intensity-legend-dot" />Intensitet</span>
+            </div>
             {stats && Object.keys(stats.volume_by_exercise).length > 0 && (
               <CustomSelect
                 value={selectedVolumeExercise}
