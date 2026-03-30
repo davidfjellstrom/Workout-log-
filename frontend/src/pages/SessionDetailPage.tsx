@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getSession, addExercise, updateExercise, getExerciseNames, ExerciseNameEntry } from '../services/api';
+import { getSession, addExercise, updateExercise, updateSession, getExerciseNames, ExerciseNameEntry } from '../services/api';
 import { Session } from '../types/session';
 import { Exercise } from '../types/exercise';
 import ScrollPicker from '../components/ScrollPicker';
@@ -28,6 +28,7 @@ export default function SessionDetailPage() {
   const [exerciseNames, setExerciseNames] = useState<ExerciseNameEntry[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [tracksWeight, setTracksWeight] = useState(true);
+  const [editingDate, setEditingDate] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editFields, setEditFields] = useState<{ sets: string; reps: string; weight_kg: string; duration_minutes: string; intensity: string }>({ sets: '', reps: '', weight_kg: '', duration_minutes: '', intensity: '' });
   const autocompleteRef = useRef<HTMLDivElement>(null);
@@ -135,7 +136,27 @@ export default function SessionDetailPage() {
       <div className="detail-header">
         <div>
           <h1>{session.title}</h1>
-          <p className="session-date">{session.date}</p>
+          {editingDate ? (
+            <input
+              type="date"
+              className="date-edit-input"
+              defaultValue={session.date}
+              autoFocus
+              onBlur={async (e) => {
+                const newDate = e.target.value;
+                if (newDate && newDate !== session.date) {
+                  const updated = await updateSession(session.id, { date: newDate });
+                  setSession((prev) => prev ? { ...prev, date: updated.date } : prev);
+                }
+                setEditingDate(false);
+              }}
+              onKeyDown={(e) => { if (e.key === 'Escape') setEditingDate(false); }}
+            />
+          ) : (
+            <p className="session-date editable-date" onClick={() => setEditingDate(true)} title="Click to edit date">
+              {session.date} <span className="edit-date-icon">✎</span>
+            </p>
+          )}
         </div>
         <Link to="/sessions" className="back-link">← Back</Link>
       </div>
