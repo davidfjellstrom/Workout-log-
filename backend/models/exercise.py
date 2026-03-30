@@ -15,9 +15,10 @@ class Exercise(Base):
     name = Column(String(100), nullable=False)
     sets = Column(Integer, nullable=True)
     reps = Column(Integer, nullable=True)
-    weight_kg = Column(Float, nullable=True)  # Valfri vikt i kg
+    weight_kg = Column(Float, nullable=True)
     duration_minutes = Column(Integer, nullable=True)
-    intensity = Column(Integer, nullable=True)  # 1–10
+    intensity = Column(Integer, nullable=True)
+    is_cardio = Column(__import__('sqlalchemy').Boolean, nullable=False, server_default='false')
 
     # Relation tillbaka till passet
     session = relationship("WorkoutSession", back_populates="exercises")

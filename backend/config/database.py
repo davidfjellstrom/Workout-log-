@@ -60,6 +60,17 @@ def init_db():
         conn.execute(__import__('sqlalchemy').text(
             "ALTER TABLE exercises ALTER COLUMN reps DROP NOT NULL"
         ))
+        conn.execute(__import__('sqlalchemy').text(
+            "ALTER TABLE exercises ADD COLUMN IF NOT EXISTS is_cardio BOOLEAN NOT NULL DEFAULT false"
+        ))
+        # Backfill: mark old exercises as cardio if they have duration set,
+        # or if they have sets=1, reps=1 and no weight (old cardio entries before is_cardio existed)
+        conn.execute(__import__('sqlalchemy').text(
+            "UPDATE exercises SET is_cardio = true WHERE is_cardio = false AND ("
+            "  duration_minutes IS NOT NULL"
+            "  OR (weight_kg IS NULL AND sets IS NOT NULL AND sets = 1 AND reps IS NOT NULL AND reps = 1)"
+            ")"
+        ))
         conn.commit()
 
     logger.info("Database tables created/verified.")
