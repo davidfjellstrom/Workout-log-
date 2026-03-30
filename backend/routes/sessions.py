@@ -1,6 +1,6 @@
 import logging
 from datetime import date
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Body
 from sqlalchemy.orm import Session
 from typing import List
 from schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionListItem, DuplicateSessionBody
@@ -119,7 +119,7 @@ async def update_session(
 @router.post("/{session_id}/duplicate", response_model=SessionListItem, status_code=status.HTTP_201_CREATED)
 async def duplicate_session(
     session_id: int,
-    body: DuplicateSessionBody = DuplicateSessionBody(),
+    body: DuplicateSessionBody = Body(default=DuplicateSessionBody()),
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(get_current_user)
 ):
