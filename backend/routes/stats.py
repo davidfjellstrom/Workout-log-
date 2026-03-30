@@ -110,8 +110,48 @@ async def get_stats(
             for row in rows
         ]
 
+    # --- volume_per_week: total duration + avg intensity per week ---
+    exercise_rows = (
+        db.query(
+            WorkoutSession.date,
+            func.sum(Exercise.duration_minutes).label("total_duration"),
+            func.avg(Exercise.intensity).label("avg_intensity"),
+        )
+        .join(Exercise, Exercise.session_id == WorkoutSession.id)
+        .filter(
+            WorkoutSession.user_id == current_user.user_id,
+            WorkoutSession.date >= start_date,
+        )
+        .group_by(WorkoutSession.date)
+        .all()
+    )
+
+    week_duration: dict[str, int] = defaultdict(int)
+    week_intensity_sum: dict[str, float] = defaultdict(float)
+    week_intensity_count: dict[str, int] = defaultdict(int)
+
+    for row in exercise_rows:
+        label = _iso_week_label(row.date)
+        if row.total_duration:
+            week_duration[label] += int(row.total_duration)
+        if row.avg_intensity is not None:
+            week_intensity_sum[label] += float(row.avg_intensity)
+            week_intensity_count[label] += 1
+
+    volume_per_week = []
+    for i in range(8):
+        week_monday = start_date + timedelta(weeks=i)
+        label = _iso_week_label(week_monday)
+        avg_intensity = round(week_intensity_sum[label] / week_intensity_count[label], 1) if week_intensity_count[label] > 0 else None
+        volume_per_week.append({
+            "week": label,
+            "duration": week_duration.get(label, 0),
+            "avg_intensity": avg_intensity,
+        })
+
     return {
         "sessions_per_week": sessions_per_week,
         "top_exercises": top_exercises,
         "exercise_progression": exercise_progression,
+        "volume_per_week": volume_per_week,
     }

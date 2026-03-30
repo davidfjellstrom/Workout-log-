@@ -4,11 +4,13 @@ import {
   Bar,
   LineChart,
   Line,
+  ComposedChart,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Legend,
 } from 'recharts';
 import { getStats } from '../services/api';
 import './StatsPage.css';
@@ -28,10 +30,17 @@ interface ProgressionPoint {
   max_weight: number;
 }
 
+interface VolumePoint {
+  week: string;
+  duration: number;
+  avg_intensity: number | null;
+}
+
 interface StatsData {
   sessions_per_week: WeekCount[];
   top_exercises: ExerciseCount[];
   exercise_progression: Record<string, ProgressionPoint[]>;
+  volume_per_week: VolumePoint[];
 }
 
 // Custom tooltip style for recharts
@@ -285,6 +294,48 @@ export default function StatsPage() {
                 ? 'No exercise data available'
                 : `No weight data recorded for ${selectedExercise}`}
             </p>
+          )}
+        </div>
+        {/* Träningsvolym per vecka */}
+        <div className="stats-card">
+          <h2>Träningsvolym per vecka</h2>
+          {stats && stats.volume_per_week.some((w) => w.duration > 0 || w.avg_intensity != null) ? (
+            <ResponsiveContainer width="100%" height={220}>
+              <ComposedChart
+                data={stats.volume_per_week.map((w) => ({
+                  ...w,
+                  week: w.week.split('-')[1] ?? w.week,
+                }))}
+                margin={{ top: 4, right: 24, left: -8, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                <XAxis dataKey="week" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis yAxisId="left" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} unit=" min" />
+                <YAxis yAxisId="right" orientation="right" domain={[0, 10]} tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  labelStyle={tooltipLabelStyle}
+                  cursor={{ fill: 'rgba(99,102,241,0.1)' }}
+                  formatter={(value, name) =>
+                    name === 'Duration' ? [`${value} min`, 'Duration'] : [`${value}/10`, 'Snittintensitet']
+                  }
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '8px' }}
+                  formatter={(value) => value === 'duration' ? 'Duration (min)' : 'Snittintensitet'}
+                />
+                <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />
+                <Line yAxisId="right" type="monotone" dataKey="avg_intensity" name="avg_intensity" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6 }} connectNulls />
+                <defs>
+                  <linearGradient id="barGradient2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8b5cf6" />
+                    <stop offset="100%" stopColor="#6366f1" />
+                  </linearGradient>
+                </defs>
+              </ComposedChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="no-data-message">Fyll i duration eller intensitet på dina övningar för att se data här.</p>
           )}
         </div>
       </div>
