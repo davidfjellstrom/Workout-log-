@@ -71,6 +71,11 @@ export async function addExercise(sessionId: number, data: CreateExerciseRequest
   return response.data;
 }
 
+export async function updateExercise(sessionId: number, exerciseId: number, data: Partial<CreateExerciseRequest>): Promise<Exercise> {
+  const response = await api.patch(`/sessions/${sessionId}/exercises/${exerciseId}`, data);
+  return response.data;
+}
+
 export interface ExerciseNameEntry {
   name: string;
   tracks_weight: boolean;

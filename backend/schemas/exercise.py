@@ -12,6 +12,15 @@ class ExerciseCreate(BaseModel):
     intensity: Optional[int] = Field(default=None, ge=1, le=10)
 
 
+class ExerciseUpdate(BaseModel):
+    """Schema för att uppdatera en övning."""
+    sets: Optional[int] = Field(default=None, ge=1)
+    reps: Optional[int] = Field(default=None, ge=1)
+    weight_kg: Optional[float] = None
+    duration_minutes: Optional[int] = Field(default=None, ge=1)
+    intensity: Optional[int] = Field(default=None, ge=1, le=10)
+
+
 class ExerciseResponse(BaseModel):
     """Schema för en övning i svaret från API:et."""
     id: int

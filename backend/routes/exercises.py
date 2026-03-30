@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from schemas.exercise import ExerciseCreate, ExerciseResponse
+from schemas.exercise import ExerciseCreate, ExerciseUpdate, ExerciseResponse
 from schemas.auth import CurrentUser
 from models.session import WorkoutSession
 from models.exercise import Exercise
@@ -77,3 +77,33 @@ async def add_exercise(
 
     logger.info("Exercise '%s' added to session '%s'", new_exercise.name, session.title)
     return new_exercise
+
+
+@router.patch("/{session_id}/exercises/{exercise_id}", response_model=ExerciseResponse)
+async def update_exercise(
+    session_id: int,
+    exercise_id: int,
+    exercise_data: ExerciseUpdate,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user)
+):
+    session = db.query(WorkoutSession).filter(
+        WorkoutSession.id == session_id,
+        WorkoutSession.user_id == current_user.user_id
+    ).first()
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    exercise = db.query(Exercise).filter(
+        Exercise.id == exercise_id,
+        Exercise.session_id == session_id
+    ).first()
+    if not exercise:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
+
+    for field, value in exercise_data.model_dump(exclude_unset=True).items():
+        setattr(exercise, field, value)
+
+    db.commit()
+    db.refresh(exercise)
+    return exercise
