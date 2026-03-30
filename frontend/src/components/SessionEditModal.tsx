@@ -18,6 +18,7 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [sessionSaved, setSessionSaved] = useState(false);
+  const [sessionSaveError, setSessionSaveError] = useState('');
   const [exerciseSavedId, setExerciseSavedId] = useState<number | null>(null);
   const [editingExerciseId, setEditingExerciseId] = useState<number | null>(null);
   const [editFields, setEditFields] = useState<{ sets: string; reps: string; weight_kg: string; duration_minutes: string; intensity: string }>({ sets: '', reps: '', weight_kg: '', duration_minutes: '', intensity: '' });
@@ -31,6 +32,7 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
   }, [sessionId]);
 
   const handleSaveSession = async () => {
+    setSessionSaveError('');
     try {
       const updated = await updateSession(sessionId, { title, date });
       onSaved(updated);
@@ -40,7 +42,7 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
         onClose();
       }, 2000);
     } catch {
-      // ignore
+      setSessionSaveError('Kunde inte spara. Försök igen.');
     }
   };
 
@@ -108,6 +110,7 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <button className="modal-save-btn" onClick={handleSaveSession}>Spara titel & datum</button>
               {sessionSaved && <span className="modal-saved-confirm">✓ Sparad!</span>}
+              {sessionSaveError && <span className="modal-save-error">{sessionSaveError}</span>}
             </div>
 
             <h3 className="modal-exercises-title">Övningar</h3>

@@ -108,11 +108,22 @@
 
 .modal-save-btn:hover { opacity: 0.88; }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .modal-saved-confirm {
   color: #4ade80;
   font-size: 0.85rem;
   font-weight: 600;
   animation: fadeIn 0.2s ease;
+}
+
+.modal-save-error {
+  color: #f87171;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .modal-exercises-title {
