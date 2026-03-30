@@ -16,6 +16,11 @@ class SessionUpdate(BaseModel):
     date: Optional[date] = None
 
 
+class DuplicateSessionBody(BaseModel):
+    """Schema för att duplicera ett träningspass."""
+    date: Optional[str] = None
+
+
 class SessionListItem(BaseModel):
     """Schema för ett pass i listvy (utan övningar, men med antal)."""
     id: int

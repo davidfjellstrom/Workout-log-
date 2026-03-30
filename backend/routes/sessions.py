@@ -3,7 +3,7 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from typing import List
-from schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionListItem
+from schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionListItem, DuplicateSessionBody
 from schemas.auth import CurrentUser
 from models.session import WorkoutSession
 from models.exercise import Exercise
@@ -119,7 +119,7 @@ async def update_session(
 @router.post("/{session_id}/duplicate", response_model=SessionListItem, status_code=status.HTTP_201_CREATED)
 async def duplicate_session(
     session_id: int,
-    body: dict = {},
+    body: DuplicateSessionBody = DuplicateSessionBody(),
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(get_current_user)
 ):
@@ -130,7 +130,7 @@ async def duplicate_session(
     if not original:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
 
-    target_date = body.get("date") or date.today().isoformat()
+    target_date = body.date or date.today().isoformat()
 
     new_session = WorkoutSession(
         user_id=current_user.user_id,
