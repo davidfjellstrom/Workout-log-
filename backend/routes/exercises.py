@@ -107,3 +107,29 @@ async def update_exercise(
     db.commit()
     db.refresh(exercise)
     return exercise
+
+
+@router.delete("/{session_id}/exercises/{exercise_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_exercise(
+    session_id: int,
+    exercise_id: int,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user)
+):
+    session = db.query(WorkoutSession).filter(
+        WorkoutSession.id == session_id,
+        WorkoutSession.user_id == current_user.user_id
+    ).first()
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    exercise = db.query(Exercise).filter(
+        Exercise.id == exercise_id,
+        Exercise.session_id == session_id
+    ).first()
+    if not exercise:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found")
+
+    db.delete(exercise)
+    db.commit()
+    return None

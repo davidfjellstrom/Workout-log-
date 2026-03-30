@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getSessions, deleteSession, updateSession, getCachedSessions } from '../services/api';
+import { getSessions, deleteSession, getCachedSessions } from '../services/api';
 import { SessionListItem } from '../types/session';
+import SessionEditModal from '../components/SessionEditModal';
 import './SessionsPage.css';
 
 interface Group {
@@ -28,9 +29,7 @@ export default function SessionsPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(cached === null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDate, setEditDate] = useState('');
+  const [modalSessionId, setModalSessionId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -53,22 +52,6 @@ export default function SessionsPage() {
       setSessions((prev) => prev.filter((s) => s.id !== id));
     } catch {
       setError('Could not delete workout');
-    }
-  };
-
-  const startEditSession = (session: SessionListItem) => {
-    setEditingId(session.id);
-    setEditTitle(session.title);
-    setEditDate(String(session.date));
-  };
-
-  const handleSaveSession = async (session: SessionListItem) => {
-    try {
-      const updated = await updateSession(session.id, { title: editTitle, date: editDate });
-      setSessions((prev) => prev.map((s) => s.id === updated.id ? updated : s));
-      setEditingId(null);
-    } catch {
-      // ignore
     }
   };
 
@@ -112,25 +95,14 @@ export default function SessionsPage() {
                   <ul className="group-sessions">
                     {group.sessions.map((session) => (
                       <li key={session.id} className="group-session-row">
-                        {editingId === session.id ? (
-                          <>
-                            <input className="session-edit-input" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} placeholder="Title" />
-                            <input className="session-edit-input" type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
-                            <button className="save-btn" onClick={() => handleSaveSession(session)}>Spara</button>
-                            <button className="cancel-btn" onClick={() => setEditingId(null)}>Avbryt</button>
-                          </>
-                        ) : (
-                          <>
-                            <Link to={`/sessions/${session.id}`} className="group-session-link">
-                              <span className="session-date">{session.date}</span>
-                              <span className="session-count">{session.exercise_count} exercises</span>
-                            </Link>
-                            <button className="session-edit-btn" onClick={() => startEditSession(session)}>
-                              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            </button>
-                            <button className="delete-button" onClick={() => handleDelete(session.id, session.title)}>Delete</button>
-                          </>
-                        )}
+                        <Link to={`/sessions/${session.id}`} className="group-session-link">
+                          <span className="session-date">{session.date}</span>
+                          <span className="session-count">{session.exercise_count} exercises</span>
+                        </Link>
+                        <button className="session-edit-btn" onClick={() => setModalSessionId(session.id)}>
+                          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button className="delete-button" onClick={() => handleDelete(session.id, session.title)}>Delete</button>
                       </li>
                     ))}
                   </ul>
@@ -139,6 +111,16 @@ export default function SessionsPage() {
             );
           })}
         </ul>
+      )}
+      {modalSessionId !== null && (
+        <SessionEditModal
+          sessionId={modalSessionId}
+          onClose={() => setModalSessionId(null)}
+          onSaved={(updated) => {
+            setSessions((prev) => prev.map((s) => s.id === updated.id ? updated : s));
+            setModalSessionId(null);
+          }}
+        />
       )}
     </div>
   );
