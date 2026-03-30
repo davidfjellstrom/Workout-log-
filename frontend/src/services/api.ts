@@ -81,6 +81,10 @@ export async function updateExercise(sessionId: number, exerciseId: number, data
   return response.data;
 }
 
+export async function deleteExercise(sessionId: number, exerciseId: number): Promise<void> {
+  await api.delete(`/sessions/${sessionId}/exercises/${exerciseId}`);
+}
+
 export interface ExerciseNameEntry {
   name: string;
   tracks_weight: boolean;
