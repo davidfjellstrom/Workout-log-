@@ -17,6 +17,8 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
   const [session, setSession] = useState<Session | null>(null);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
+  const [sessionSaved, setSessionSaved] = useState(false);
+  const [exerciseSavedId, setExerciseSavedId] = useState<number | null>(null);
   const [editingExerciseId, setEditingExerciseId] = useState<number | null>(null);
   const [editFields, setEditFields] = useState<{ sets: string; reps: string; weight_kg: string; duration_minutes: string; intensity: string }>({ sets: '', reps: '', weight_kg: '', duration_minutes: '', intensity: '' });
 
@@ -32,6 +34,8 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
     try {
       const updated = await updateSession(sessionId, { title, date });
       onSaved(updated);
+      setSessionSaved(true);
+      setTimeout(() => setSessionSaved(false), 2000);
     } catch {
       // ignore
     }
@@ -58,6 +62,8 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
         intensity: editFields.intensity ? Number(editFields.intensity) : undefined,
       });
       setSession((prev) => prev ? { ...prev, exercises: prev.exercises.map((e) => e.id === updated.id ? updated : e) } : prev);
+      setExerciseSavedId(updated.id);
+      setTimeout(() => setExerciseSavedId(null), 2000);
       setEditingExerciseId(null);
     } catch {
       // ignore
@@ -96,7 +102,10 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
                 <input className="modal-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
             </div>
-            <button className="modal-save-btn" onClick={handleSaveSession}>Spara titel & datum</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <button className="modal-save-btn" onClick={handleSaveSession}>Spara titel & datum</button>
+              {sessionSaved && <span className="modal-saved-confirm">✓ Sparad!</span>}
+            </div>
 
             <h3 className="modal-exercises-title">Övningar</h3>
             {session.exercises.length === 0 ? (
@@ -127,6 +136,7 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
                         <div className="modal-exercise-actions">
                           <button className="save-btn" onClick={() => handleSaveExercise(ex)}>Spara</button>
                           <button className="cancel-btn" onClick={() => setEditingExerciseId(null)}>Avbryt</button>
+                          {exerciseSavedId === ex.id && <span className="modal-saved-confirm">✓ Sparad!</span>}
                         </div>
                       </div>
                     ) : (

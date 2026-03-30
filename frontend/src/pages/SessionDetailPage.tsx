@@ -29,7 +29,9 @@ export default function SessionDetailPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [tracksWeight, setTracksWeight] = useState(true);
   const [editingDate, setEditingDate] = useState(false);
+  const [dateSaved, setDateSaved] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [exerciseSavedId, setExerciseSavedId] = useState<number | null>(null);
   const [editFields, setEditFields] = useState<{ sets: string; reps: string; weight_kg: string; duration_minutes: string; intensity: string }>({ sets: '', reps: '', weight_kg: '', duration_minutes: '', intensity: '' });
   const autocompleteRef = useRef<HTMLDivElement>(null);
 
@@ -122,6 +124,8 @@ export default function SessionDetailPage() {
       setSession((prev) =>
         prev ? { ...prev, exercises: prev.exercises.map((e) => e.id === updated.id ? updated : e) } : prev
       );
+      setExerciseSavedId(updated.id);
+      setTimeout(() => setExerciseSavedId(null), 2000);
       setEditingId(null);
     } catch {
       // ignore
@@ -147,6 +151,8 @@ export default function SessionDetailPage() {
                 if (newDate && newDate !== session.date) {
                   const updated = await updateSession(session.id, { date: newDate });
                   setSession((prev) => prev ? { ...prev, date: updated.date } : prev);
+                  setDateSaved(true);
+                  setTimeout(() => setDateSaved(false), 2000);
                 }
                 setEditingDate(false);
               }}
@@ -155,6 +161,7 @@ export default function SessionDetailPage() {
           ) : (
             <p className="session-date editable-date" onClick={() => setEditingDate(true)} title="Click to edit date">
               {session.date} <span className="edit-date-icon">✎</span>
+              {dateSaved && <span className="saved-confirm" style={{ marginLeft: '0.5rem' }}>✓ Saved!</span>}
             </p>
           )}
         </div>
@@ -211,9 +218,12 @@ export default function SessionDetailPage() {
                 {hasWeight && <td>{exercise.weight_kg ?? '—'}</td>}
                 {hasDuration && <td>{exercise.duration_minutes ?? '—'}</td>}
                 {hasIntensity && <td>{exercise.intensity != null ? `${exercise.intensity}/10` : '—'}</td>}
-                <td><button className="edit-btn" onClick={() => startEdit(exercise)}>
-  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-</button></td>
+                <td style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  {exerciseSavedId === exercise.id && <span className="saved-confirm">✓</span>}
+                  <button className="edit-btn" onClick={() => startEdit(exercise)}>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                </td>
               </tr>
               )
             ))}
