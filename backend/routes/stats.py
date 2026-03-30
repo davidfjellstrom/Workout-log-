@@ -36,14 +36,11 @@ async def get_stats(
     - exercise_progression: for each top exercise, sorted list of {date, max_weight}
     """
     today = date.today()
-
-    # --- sessions_per_week: last 8 weeks (+ any future weeks with sessions) ---
     current_week_monday = today - timedelta(days=today.weekday())
-    start_date = current_week_monday - timedelta(weeks=7)
 
+    # Fetch all sessions for this user (no date cutoff) so the window covers all data
     sessions = db.query(WorkoutSession).filter(
         WorkoutSession.user_id == current_user.user_id,
-        WorkoutSession.date >= start_date
     ).all()
 
     week_counts: dict[str, int] = defaultdict(int)
@@ -51,10 +48,16 @@ async def get_stats(
         label = _iso_week_label(session.date)
         week_counts[label] += 1
 
-    # Extend end to cover any future sessions beyond current week
-    latest_session_date = max((s.date for s in sessions), default=today)
-    latest_week_monday = latest_session_date - timedelta(days=latest_session_date.weekday())
-    end_week_monday = max(current_week_monday, latest_week_monday)
+    # Window: from the earliest session's week to the latest (including future)
+    if sessions:
+        earliest = min(s.date for s in sessions)
+        latest = max(s.date for s in sessions)
+    else:
+        earliest = today
+        latest = today
+
+    start_date = earliest - timedelta(days=earliest.weekday())
+    end_week_monday = max(current_week_monday, latest - timedelta(days=latest.weekday()))
     num_weeks = (end_week_monday - start_date).days // 7 + 1
 
     sessions_per_week = []
@@ -123,7 +126,6 @@ async def get_stats(
         .join(Exercise, Exercise.session_id == WorkoutSession.id)
         .filter(
             WorkoutSession.user_id == current_user.user_id,
-            WorkoutSession.date >= start_date,
         )
         .group_by(WorkoutSession.date)
         .all()
@@ -158,7 +160,6 @@ async def get_stats(
         .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
         .filter(
             WorkoutSession.user_id == current_user.user_id,
-            WorkoutSession.date >= start_date,
             or_(Exercise.duration_minutes.isnot(None), Exercise.intensity.isnot(None))
         )
         .distinct()
@@ -176,7 +177,6 @@ async def get_stats(
             .join(Exercise, Exercise.session_id == WorkoutSession.id)
             .filter(
                 WorkoutSession.user_id == current_user.user_id,
-                WorkoutSession.date >= start_date,
                 Exercise.name == ex_name,
             )
             .group_by(WorkoutSession.date)
