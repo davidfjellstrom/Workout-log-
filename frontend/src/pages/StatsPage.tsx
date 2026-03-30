@@ -316,13 +316,15 @@ export default function StatsPage() {
                   contentStyle={tooltipStyle}
                   labelStyle={tooltipLabelStyle}
                   cursor={{ fill: 'rgba(99,102,241,0.1)' }}
-                  formatter={(value, name) =>
-                    name === 'Duration' ? [`${value} min`, 'Duration'] : [`${value}/10`, 'Snittintensitet']
-                  }
+                  formatter={(value, name) => {
+                    if (name === 'Duration') return Number(value) === 0 ? null : [`${value} min`, 'Duration'];
+                    if (value == null) return null;
+                    return [`${value}/10`, 'Snittintensitet'];
+                  }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: '0.8rem', color: '#94a3b8', paddingTop: '8px' }}
-                  formatter={(value) => value === 'duration' ? 'Duration (min)' : 'Snittintensitet'}
+                  formatter={(value) => value === 'Duration' ? 'Duration (min)' : 'Snittintensitet'}
                 />
                 <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />
                 <Line yAxisId="right" type="monotone" dataKey="avg_intensity" name="avg_intensity" stroke="#f59e0b" strokeWidth={2.5} dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6 }} connectNulls />
