@@ -54,6 +54,12 @@ def init_db():
         conn.execute(__import__('sqlalchemy').text(
             "ALTER TABLE exercises ADD COLUMN IF NOT EXISTS intensity INTEGER"
         ))
+        conn.execute(__import__('sqlalchemy').text(
+            "ALTER TABLE exercises ALTER COLUMN sets DROP NOT NULL"
+        ))
+        conn.execute(__import__('sqlalchemy').text(
+            "ALTER TABLE exercises ALTER COLUMN reps DROP NOT NULL"
+        ))
         conn.commit()
 
     logger.info("Database tables created/verified.")

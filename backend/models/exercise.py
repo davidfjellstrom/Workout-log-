@@ -13,8 +13,8 @@ class Exercise(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     session_id = Column(Integer, ForeignKey("workout_sessions.id"), nullable=False, index=True)
     name = Column(String(100), nullable=False)
-    sets = Column(Integer, nullable=False)
-    reps = Column(Integer, nullable=False)
+    sets = Column(Integer, nullable=True)
+    reps = Column(Integer, nullable=True)
     weight_kg = Column(Float, nullable=True)  # Valfri vikt i kg
     duration_minutes = Column(Integer, nullable=True)
     intensity = Column(Integer, nullable=True)  # 1–10

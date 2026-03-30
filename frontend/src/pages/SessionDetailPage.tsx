@@ -71,10 +71,10 @@ export default function SessionDetailPage() {
     try {
       const newExercise: Exercise = await addExercise(Number(id), {
         name,
-        sets: tracksWeight ? Number(sets) : 1,
-        reps: tracksWeight ? Number(reps) : 1,
+        sets: tracksWeight && sets ? Number(sets) : undefined,
+        reps: tracksWeight && reps ? Number(reps) : undefined,
         weight_kg: tracksWeight && weightKg ? Number(weightKg) : undefined,
-        duration_minutes: durationMinutes ? Number(durationMinutes) : undefined,
+        duration_minutes: !tracksWeight && durationMinutes ? Number(durationMinutes) : undefined,
         intensity: intensity ? Number(intensity) : undefined,
       });
 
@@ -145,13 +145,14 @@ export default function SessionDetailPage() {
           const hasDuration = session.exercises.some((e) => e.duration_minutes != null);
           const hasIntensity = session.exercises.some((e) => e.intensity != null);
           const hasWeight = session.exercises.some((e) => e.weight_kg != null);
+          const hasSetsReps = session.exercises.some((e) => e.sets != null || e.reps != null);
           return (
         <table className="exercises-table">
           <thead>
             <tr>
               <th>Exercise</th>
-              <th>Sets</th>
-              <th>Reps</th>
+              {hasSetsReps && <th>Sets</th>}
+              {hasSetsReps && <th>Reps</th>}
               {hasWeight && <th>Weight (kg)</th>}
               {hasDuration && <th>Duration (min)</th>}
               {hasIntensity && <th>Intensitet</th>}
@@ -163,8 +164,8 @@ export default function SessionDetailPage() {
               editingId === exercise.id ? (
                 <tr key={exercise.id} className="edit-row">
                   <td>{exercise.name}</td>
-                  <td><input className="edit-input" type="number" value={editFields.sets} onChange={(e) => setEditFields((f) => ({ ...f, sets: e.target.value }))} /></td>
-                  <td><input className="edit-input" type="number" value={editFields.reps} onChange={(e) => setEditFields((f) => ({ ...f, reps: e.target.value }))} /></td>
+                  {hasSetsReps && <td><input className="edit-input" type="number" value={editFields.sets} onChange={(e) => setEditFields((f) => ({ ...f, sets: e.target.value }))} /></td>}
+                  {hasSetsReps && <td><input className="edit-input" type="number" value={editFields.reps} onChange={(e) => setEditFields((f) => ({ ...f, reps: e.target.value }))} /></td>}
                   {hasWeight && <td><input className="edit-input" type="number" value={editFields.weight_kg} onChange={(e) => setEditFields((f) => ({ ...f, weight_kg: e.target.value }))} placeholder="—" /></td>}
                   {hasDuration && <td><input className="edit-input" type="number" value={editFields.duration_minutes} onChange={(e) => setEditFields((f) => ({ ...f, duration_minutes: e.target.value }))} placeholder="—" /></td>}
                   {hasIntensity && (
@@ -181,8 +182,8 @@ export default function SessionDetailPage() {
               ) : (
               <tr key={exercise.id}>
                 <td>{exercise.name}</td>
-                <td>{exercise.sets}</td>
-                <td>{exercise.reps}</td>
+                {hasSetsReps && <td>{exercise.sets ?? '—'}</td>}
+                {hasSetsReps && <td>{exercise.reps ?? '—'}</td>}
                 {hasWeight && <td>{exercise.weight_kg ?? '—'}</td>}
                 {hasDuration && <td>{exercise.duration_minutes ?? '—'}</td>}
                 {hasIntensity && <td>{exercise.intensity != null ? `${exercise.intensity}/10` : '—'}</td>}
