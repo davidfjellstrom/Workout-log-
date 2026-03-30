@@ -151,6 +151,11 @@
   margin-left: auto;
 }
 
+.group-toggle .session-count {
+  min-width: 82px;
+  text-align: center;
+}
+
 .group-chevron {
   font-size: 1.2rem;
   color: #94a3b8;
