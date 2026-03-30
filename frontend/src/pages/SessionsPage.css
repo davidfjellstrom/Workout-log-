@@ -147,8 +147,11 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-.group-chevron {
+.group-toggle .session-date {
   margin-left: auto;
+}
+
+.group-chevron {
   font-size: 1.2rem;
   color: #94a3b8;
   transition: transform 0.2s;
