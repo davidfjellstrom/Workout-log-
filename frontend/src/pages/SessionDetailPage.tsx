@@ -110,16 +110,20 @@ export default function SessionDetailPage() {
 
       {session.exercises.length === 0 ? (
         <p className="empty-message">No exercises yet. Add the first one below!</p>
-      ) : (
+      ) : (() => {
+          const hasDuration = session.exercises.some((e) => e.duration_minutes != null);
+          const hasIntensity = session.exercises.some((e) => e.intensity != null);
+          const hasWeight = session.exercises.some((e) => e.weight_kg != null);
+          return (
         <table className="exercises-table">
           <thead>
             <tr>
               <th>Exercise</th>
               <th>Sets</th>
               <th>Reps</th>
-              <th>Weight (kg)</th>
-              <th>Duration (min)</th>
-              <th>Intensitet</th>
+              {hasWeight && <th>Weight (kg)</th>}
+              {hasDuration && <th>Duration (min)</th>}
+              {hasIntensity && <th>Intensitet</th>}
             </tr>
           </thead>
           <tbody>
@@ -128,14 +132,15 @@ export default function SessionDetailPage() {
                 <td>{exercise.name}</td>
                 <td>{exercise.sets}</td>
                 <td>{exercise.reps}</td>
-                <td>{exercise.weight_kg ?? '—'}</td>
-                <td>{exercise.duration_minutes ?? '—'}</td>
-                <td>{exercise.intensity != null ? `${exercise.intensity}/10` : '—'}</td>
+                {hasWeight && <td>{exercise.weight_kg ?? '—'}</td>}
+                {hasDuration && <td>{exercise.duration_minutes ?? '—'}</td>}
+                {hasIntensity && <td>{exercise.intensity != null ? `${exercise.intensity}/10` : '—'}</td>}
               </tr>
             ))}
           </tbody>
         </table>
-      )}
+          );
+        })()}
 
       <div className="add-exercise-form">
         <h2>Add exercise</h2>
