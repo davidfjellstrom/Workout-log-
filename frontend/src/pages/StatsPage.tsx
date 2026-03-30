@@ -60,7 +60,7 @@ export default function StatsPage() {
         const data = await getStats();
         setStats(data);
         const firstWithWeight = data.top_exercises.find(
-          (ex) => (data.exercise_progression[ex.name] ?? []).length > 0
+          (ex: ExerciseCount) => (data.exercise_progression[ex.name] ?? []).length > 0
         );
         if (firstWithWeight) setSelectedExercise(firstWithWeight.name);
       } catch {
