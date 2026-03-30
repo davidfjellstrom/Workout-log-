@@ -322,8 +322,14 @@ h2 {
   margin-bottom: 1.25rem;
 }
 
+.duration-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  padding: 0 2px;
+}
+
 .duration-ticks span {
-  width: auto;
   font-size: 0.72rem;
   color: #475569;
   text-align: center;
