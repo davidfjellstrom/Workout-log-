@@ -41,8 +41,10 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
         setSessionSaved(false);
         onClose();
       }, 2000);
-    } catch {
-      setSessionSaveError('Kunde inte spara. Försök igen.');
+    } catch (err: unknown) {
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      setSessionSaveError(detail ? `Fel: ${detail}` : 'Kunde inte spara. Försök igen.');
+      console.error('updateSession failed:', err);
     }
   };
 
