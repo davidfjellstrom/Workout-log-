@@ -22,16 +22,20 @@ async def get_exercise_names(
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(get_current_user)
 ):
-    """Returns all unique exercise names the current user has previously used, sorted by frequency."""
+    """Returns all unique exercise names the current user has previously used, sorted by frequency.
+    Each entry includes tracks_weight=True if the exercise has ever had a weight value recorded."""
     rows = (
-        db.query(Exercise.name)
+        db.query(
+            Exercise.name,
+            func.max(Exercise.weight_kg).label("max_weight")
+        )
         .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
         .filter(WorkoutSession.user_id == current_user.user_id)
         .group_by(Exercise.name)
         .order_by(func.count(Exercise.id).desc())
         .all()
     )
-    return [row.name for row in rows]
+    return [{"name": row.name, "tracks_weight": row.max_weight is not None} for row in rows]
 
 
 @router.post("/{session_id}/exercises", response_model=ExerciseResponse, status_code=status.HTTP_201_CREATED)

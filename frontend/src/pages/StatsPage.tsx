@@ -59,9 +59,10 @@ export default function StatsPage() {
       try {
         const data = await getStats();
         setStats(data);
-        if (data.top_exercises.length > 0) {
-          setSelectedExercise(data.top_exercises[0].name);
-        }
+        const firstWithWeight = data.top_exercises.find(
+          (ex) => (data.exercise_progression[ex.name] ?? []).length > 0
+        );
+        if (firstWithWeight) setSelectedExercise(firstWithWeight.name);
       } catch {
         setError('Could not load statistics');
       } finally {
@@ -224,11 +225,13 @@ export default function StatsPage() {
                 value={selectedExercise}
                 onChange={(e) => setSelectedExercise(e.target.value)}
               >
-                {stats.top_exercises.map((ex) => (
-                  <option key={ex.name} value={ex.name}>
-                    {ex.name}
-                  </option>
-                ))}
+                {stats.top_exercises
+                  .filter((ex) => (stats.exercise_progression[ex.name] ?? []).length > 0)
+                  .map((ex) => (
+                    <option key={ex.name} value={ex.name}>
+                      {ex.name}
+                    </option>
+                  ))}
               </select>
             )}
           </div>
