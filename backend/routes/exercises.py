@@ -64,6 +64,7 @@ async def add_exercise(
     new_exercise = Exercise(
         session_id=session_id,
         name=exercise_data.name,
+        is_cardio=exercise_data.is_cardio,
         sets=exercise_data.sets,
         reps=exercise_data.reps,
         weight_kg=exercise_data.weight_kg,
