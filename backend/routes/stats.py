@@ -73,19 +73,22 @@ async def get_stats(
 
     top_exercises = [{"name": row.name, "count": row.count} for row in top_exercises_query]
 
-    # Only include exercises that track weight (have ever had a non-null weight_kg)
-    # in the progression section
-    weight_tracking_names_query = (
-        db.query(Exercise.name)
-        .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
-        .filter(
-            WorkoutSession.user_id == current_user.user_id,
-            Exercise.weight_kg.isnot(None)
+    # Only include exercises where the majority of entries have weight data
+    weight_ratio_query = (
+        db.query(
+            Exercise.name,
+            func.count(Exercise.id).label("total"),
+            func.sum(func.case((Exercise.weight_kg.isnot(None), 1), else_=0)).label("with_weight")
         )
+        .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
+        .filter(WorkoutSession.user_id == current_user.user_id)
         .group_by(Exercise.name)
         .all()
     )
-    weight_tracking_names = {row.name for row in weight_tracking_names_query}
+    weight_tracking_names = {
+        row.name for row in weight_ratio_query
+        if row.total > 0 and (row.with_weight / row.total) > 0.5
+    }
     top_exercise_names = [row["name"] for row in top_exercises if row["name"] in weight_tracking_names]
 
     # --- exercise_progression: max weight per date for each top exercise ---
