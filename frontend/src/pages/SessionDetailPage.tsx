@@ -199,13 +199,31 @@ export default function SessionDetailPage() {
                 </div>
               </>
             )}
-            <div className="form-group">
-              <label>Duration (min):</label>
-              <ScrollPicker value={durationMinutes} onChange={setDurationMinutes} options={DURATION_OPTIONS} />
-            </div>
-            <div className="form-group">
-              <label>Intensitet (1–10):</label>
-              <ScrollPicker value={intensity} onChange={setIntensity} options={INTENSITY_OPTIONS} />
+            {!tracksWeight && (
+              <div className="form-group">
+                <label>Duration (min):</label>
+                <ScrollPicker value={durationMinutes} onChange={setDurationMinutes} options={DURATION_OPTIONS} />
+              </div>
+            )}
+          </div>
+          <div className="intensity-row">
+            <label className="intensity-label">
+              Intensitet: <span className="intensity-value">{intensity ? `${intensity}/10` : '—'}</span>
+            </label>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={intensity || ''}
+              onChange={(e) => setIntensity(e.target.value)}
+              className="intensity-slider"
+              style={{ '--val': intensity || 1 } as React.CSSProperties}
+            />
+            <div className="intensity-ticks">
+              {INTENSITY_OPTIONS.map((n) => (
+                <span key={n}>{n}</span>
+              ))}
             </div>
           </div>
           {formError && <p className="error-message">{formError}</p>}
