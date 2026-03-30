@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getSession, addExercise, getExerciseNames, ExerciseNameEntry } from '../services/api';
+import { getSession, addExercise, updateExercise, getExerciseNames, ExerciseNameEntry } from '../services/api';
 import { Session } from '../types/session';
 import { Exercise } from '../types/exercise';
 import ScrollPicker from '../components/ScrollPicker';
@@ -28,6 +28,8 @@ export default function SessionDetailPage() {
   const [exerciseNames, setExerciseNames] = useState<ExerciseNameEntry[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [tracksWeight, setTracksWeight] = useState(true);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFields, setEditFields] = useState<{ sets: string; reps: string; weight_kg: string; duration_minutes: string; intensity: string }>({ sets: '', reps: '', weight_kg: '', duration_minutes: '', intensity: '' });
   const autocompleteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,6 +95,35 @@ export default function SessionDetailPage() {
     }
   };
 
+  const startEdit = (exercise: Exercise) => {
+    setEditingId(exercise.id);
+    setEditFields({
+      sets: String(exercise.sets),
+      reps: String(exercise.reps),
+      weight_kg: exercise.weight_kg != null ? String(exercise.weight_kg) : '',
+      duration_minutes: exercise.duration_minutes != null ? String(exercise.duration_minutes) : '',
+      intensity: exercise.intensity != null ? String(exercise.intensity) : '',
+    });
+  };
+
+  const handleSaveEdit = async (exercise: Exercise) => {
+    try {
+      const updated = await updateExercise(Number(id), exercise.id, {
+        sets: editFields.sets ? Number(editFields.sets) : undefined,
+        reps: editFields.reps ? Number(editFields.reps) : undefined,
+        weight_kg: editFields.weight_kg ? Number(editFields.weight_kg) : undefined,
+        duration_minutes: editFields.duration_minutes ? Number(editFields.duration_minutes) : undefined,
+        intensity: editFields.intensity ? Number(editFields.intensity) : undefined,
+      });
+      setSession((prev) =>
+        prev ? { ...prev, exercises: prev.exercises.map((e) => e.id === updated.id ? updated : e) } : prev
+      );
+      setEditingId(null);
+    } catch {
+      // ignore
+    }
+  };
+
   if (error) return <div className="page-container"><p className="error-message">{error}</p></div>;
   if (!session) return <div className="page-container"><p>Loading...</p></div>;
 
@@ -124,10 +155,30 @@ export default function SessionDetailPage() {
               {hasWeight && <th>Weight (kg)</th>}
               {hasDuration && <th>Duration (min)</th>}
               {hasIntensity && <th>Intensitet</th>}
+              <th></th>
             </tr>
           </thead>
           <tbody>
             {session.exercises.map((exercise) => (
+              editingId === exercise.id ? (
+                <tr key={exercise.id} className="edit-row">
+                  <td>{exercise.name}</td>
+                  <td><input className="edit-input" type="number" value={editFields.sets} onChange={(e) => setEditFields((f) => ({ ...f, sets: e.target.value }))} /></td>
+                  <td><input className="edit-input" type="number" value={editFields.reps} onChange={(e) => setEditFields((f) => ({ ...f, reps: e.target.value }))} /></td>
+                  {hasWeight && <td><input className="edit-input" type="number" value={editFields.weight_kg} onChange={(e) => setEditFields((f) => ({ ...f, weight_kg: e.target.value }))} placeholder="—" /></td>}
+                  {hasDuration && <td><input className="edit-input" type="number" value={editFields.duration_minutes} onChange={(e) => setEditFields((f) => ({ ...f, duration_minutes: e.target.value }))} placeholder="—" /></td>}
+                  {hasIntensity && (
+                    <td>
+                      <input type="range" min={1} max={10} step={1} value={editFields.intensity || ''} onChange={(e) => setEditFields((f) => ({ ...f, intensity: e.target.value }))} className="intensity-slider edit-slider" style={{ '--val': editFields.intensity || 1 } as React.CSSProperties} />
+                      <span className="edit-intensity-val">{editFields.intensity ? `${editFields.intensity}/10` : '—'}</span>
+                    </td>
+                  )}
+                  <td className="edit-actions">
+                    <button className="save-btn" onClick={() => handleSaveEdit(exercise)}>Spara</button>
+                    <button className="cancel-btn" onClick={() => setEditingId(null)}>Avbryt</button>
+                  </td>
+                </tr>
+              ) : (
               <tr key={exercise.id}>
                 <td>{exercise.name}</td>
                 <td>{exercise.sets}</td>
@@ -135,7 +186,9 @@ export default function SessionDetailPage() {
                 {hasWeight && <td>{exercise.weight_kg ?? '—'}</td>}
                 {hasDuration && <td>{exercise.duration_minutes ?? '—'}</td>}
                 {hasIntensity && <td>{exercise.intensity != null ? `${exercise.intensity}/10` : '—'}</td>}
+                <td><button className="edit-btn" onClick={() => startEdit(exercise)}>✏️</button></td>
               </tr>
+              )
             ))}
           </tbody>
         </table>
