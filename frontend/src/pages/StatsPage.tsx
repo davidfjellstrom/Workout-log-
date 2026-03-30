@@ -239,7 +239,7 @@ export default function StatsPage() {
             <ResponsiveContainer width="100%" height={220}>
               <LineChart
                 data={progressionData}
-                margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
+                margin={{ top: 4, right: 8, left: -8, bottom: 0 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
