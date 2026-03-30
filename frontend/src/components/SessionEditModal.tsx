@@ -37,9 +37,6 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
     }
   };
 
-  const isStrength = (ex: Exercise) =>
-    ex.weight_kg != null || (ex.sets != null && (ex.sets > 1 || (ex.reps != null && ex.reps > 1)));
-
   const startEditExercise = (ex: Exercise) => {
     setEditingExerciseId(ex.id);
     setEditFields({
@@ -112,7 +109,7 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
                       <div className="modal-exercise-edit">
                         <span className="modal-exercise-name">{ex.name}</span>
                         <div className="modal-exercise-inputs">
-                          {isStrength(ex) ? (
+                          {!ex.is_cardio ? (
                             <>
                               <label>Sets<input className="modal-small-input" type="number" value={editFields.sets} onChange={(e) => setEditFields((f) => ({ ...f, sets: e.target.value }))} /></label>
                               <label>Reps<input className="modal-small-input" type="number" value={editFields.reps} onChange={(e) => setEditFields((f) => ({ ...f, reps: e.target.value }))} /></label>
@@ -137,7 +134,7 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
                         <div className="modal-exercise-info">
                           <span className="modal-exercise-name">{ex.name}</span>
                           <span className="modal-exercise-meta">
-                            {isStrength(ex) ? (ex.weight_kg != null ? `${ex.sets}×${ex.reps} @ ${ex.weight_kg}kg` : `${ex.sets}×${ex.reps}`) : ''}
+                            {!ex.is_cardio ? (ex.weight_kg != null ? `${ex.sets}×${ex.reps} @ ${ex.weight_kg}kg` : `${ex.sets}×${ex.reps}`) : ''}
                             {ex.duration_minutes != null ? ` ${ex.duration_minutes}min` : ''}
                             {ex.intensity != null ? ` · ${ex.intensity}/10` : ''}
                           </span>

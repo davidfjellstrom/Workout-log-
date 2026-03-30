@@ -71,6 +71,7 @@ export default function SessionDetailPage() {
     try {
       const newExercise: Exercise = await addExercise(Number(id), {
         name,
+        is_cardio: !tracksWeight,
         sets: tracksWeight && sets ? Number(sets) : undefined,
         reps: tracksWeight && reps ? Number(reps) : undefined,
         weight_kg: tracksWeight && weightKg ? Number(weightKg) : undefined,
@@ -142,12 +143,10 @@ export default function SessionDetailPage() {
       {session.exercises.length === 0 ? (
         <p className="empty-message">No exercises yet. Add the first one below!</p>
       ) : (() => {
-          const hasDuration = session.exercises.some((e) => e.duration_minutes != null);
+          const hasDuration = session.exercises.some((e) => e.is_cardio);
           const hasIntensity = session.exercises.some((e) => e.intensity != null);
           const hasWeight = session.exercises.some((e) => e.weight_kg != null);
-          const hasSetsReps = session.exercises.some((e) =>
-            e.weight_kg != null || (e.sets != null && (e.sets > 1 || (e.reps != null && e.reps > 1)))
-          );
+          const hasSetsReps = session.exercises.some((e) => !e.is_cardio);
           return (
         <table className="exercises-table">
           <thead>
