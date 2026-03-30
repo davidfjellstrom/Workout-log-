@@ -24,6 +24,7 @@ export default function SessionDetailPage() {
   const [intensity, setIntensity] = useState('');
   const [formError, setFormError] = useState('');
   const [addingExercise, setAddingExercise] = useState(false);
+  const [savedConfirm, setSavedConfirm] = useState(false);
   const [exerciseNames, setExerciseNames] = useState<ExerciseNameEntry[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [tracksWeight, setTracksWeight] = useState(true);
@@ -88,6 +89,8 @@ export default function SessionDetailPage() {
       setWeightKg('');
       setDurationMinutes('');
       setIntensity('');
+      setSavedConfirm(true);
+      setTimeout(() => setSavedConfirm(false), 2000);
     } catch {
       setFormError('Could not add exercise');
     } finally {
@@ -318,9 +321,12 @@ export default function SessionDetailPage() {
             </div>
           </div>
           {formError && <p className="error-message">{formError}</p>}
-          <button type="submit" className="submit-button" disabled={addingExercise}>
-            {addingExercise ? 'Adding...' : 'Add exercise'}
-          </button>
+          <div className="submit-row">
+            <button type="submit" className="submit-button" disabled={addingExercise}>
+              {addingExercise ? 'Saving...' : 'Save exercise'}
+            </button>
+            {savedConfirm && <span className="saved-confirm">✓ Saved!</span>}
+          </div>
         </form>
       </div>
     </div>
