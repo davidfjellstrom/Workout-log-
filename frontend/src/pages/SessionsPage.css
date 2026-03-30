@@ -190,6 +190,10 @@
   color: #f1f5f9;
 }
 
+.group-session-link .session-count {
+  margin-left: auto;
+}
+
 .session-edit-btn {
   background: none;
   border: none;
