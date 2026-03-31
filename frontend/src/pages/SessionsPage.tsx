@@ -132,6 +132,10 @@ export default function SessionsPage() {
           onSaved={(updated) => {
             setSessions((prev) => prev.map((s) => s.id === updated.id ? updated : s));
           }}
+          onDeleted={(id) => {
+            setSessions((prev) => prev.filter((s) => s.id !== id));
+            setModalSessionId(null);
+          }}
         />
       )}
     </div>

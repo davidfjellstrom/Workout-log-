@@ -74,6 +74,7 @@ async def get_stats(
         .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
         .filter(WorkoutSession.user_id == current_user.user_id)
     )
+    top_q = top_q.filter(WorkoutSession.date <= today)
     if days:
         cutoff = today - timedelta(days=days)
         top_q = top_q.filter(WorkoutSession.date >= cutoff)
