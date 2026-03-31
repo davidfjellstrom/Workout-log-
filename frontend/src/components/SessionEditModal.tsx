@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getSession, updateSession, updateExercise, deleteExercise } from '../services/api';
+import { getSession, updateSession, updateExercise, deleteExercise, deleteSession } from '../services/api';
 import { Session } from '../types/session';
 import { Exercise } from '../types/exercise';
 import { SessionListItem } from '../types/session';
@@ -12,9 +12,10 @@ interface Props {
   sessionId: number;
   onClose: () => void;
   onSaved: (updated: SessionListItem) => void;
+  onDeleted?: (id: number) => void;
 }
 
-export default function SessionEditModal({ sessionId, onClose, onSaved }: Props) {
+export default function SessionEditModal({ sessionId, onClose, onSaved, onDeleted }: Props) {
   const [session, setSession] = useState<Session | null>(null);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
@@ -81,6 +82,17 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
     }
   };
 
+  const handleDeleteSession = async () => {
+    if (!confirm(`Ta bort passet "${title}"? Detta går inte att ångra.`)) return;
+    try {
+      await deleteSession(sessionId);
+      onDeleted?.(sessionId);
+      onClose();
+    } catch {
+      // ignore
+    }
+  };
+
   const handleDeleteExercise = async (ex: Exercise) => {
     if (!confirm(`Ta bort "${ex.name}"?`)) return;
     try {
@@ -118,6 +130,8 @@ export default function SessionEditModal({ sessionId, onClose, onSaved }: Props)
               {sessionSaved && <span className="modal-saved-confirm">✓ Sparad!</span>}
               {sessionSaveError && <span className="modal-save-error">{sessionSaveError}</span>}
             </div>
+
+            <button className="modal-delete-session-btn" onClick={handleDeleteSession}>Ta bort pass</button>
 
             <h3 className="modal-exercises-title">Övningar</h3>
             {session.exercises.length === 0 ? (
