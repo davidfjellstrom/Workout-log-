@@ -178,3 +178,33 @@
   border-radius: 10px !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
+
+.stats-summary-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.stats-summary-card {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.stats-summary-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  line-height: 1;
+}
+
+.stats-summary-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+}

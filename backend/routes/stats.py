@@ -88,6 +88,24 @@ async def get_stats(
 
     top_exercises = [{"name": row.name, "count": row.count} for row in top_exercises_query]
 
+    # Previous period for trend arrows
+    top_exercises_prev: dict[str, int] | None = None
+    if days:
+        prev_end = today - timedelta(days=days)
+        prev_start = prev_end - timedelta(days=days)
+        prev_q = (
+            db.query(Exercise.name, func.count(Exercise.id).label("count"))
+            .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
+            .filter(
+                WorkoutSession.user_id == current_user.user_id,
+                WorkoutSession.date >= prev_start,
+                WorkoutSession.date < prev_end,
+            )
+            .group_by(Exercise.name)
+            .all()
+        )
+        top_exercises_prev = {row.name: row.count for row in prev_q}
+
     # Only include exercises that track weight (have ever had a non-null weight_kg)
     # in the progression section
     weight_tracking_names_query = (
@@ -211,6 +229,7 @@ async def get_stats(
     return {
         "sessions_per_week": sessions_per_week,
         "top_exercises": top_exercises,
+        "top_exercises_prev": top_exercises_prev,
         "exercise_progression": exercise_progression,
         "volume_per_week": volume_per_week,
         "volume_by_exercise": volume_by_exercise,
