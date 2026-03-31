@@ -390,9 +390,9 @@ export default function StatsPage() {
                   name="Max weight"
                   stroke="#8b5cf6"
                   strokeWidth={2.5}
-                  dot={(props: { cx: number; cy: number; payload: { max_weight: number } }) => {
-                    const { cx, cy, payload } = props;
-                    const isPR = prWeight != null && payload.max_weight === prWeight;
+                  dot={(props: { cx?: number; cy?: number; payload?: { max_weight: number } }) => {
+                    const { cx = 0, cy = 0, payload } = props;
+                    const isPR = prWeight != null && payload?.max_weight === prWeight;
                     if (isPR) {
                       return (
                         <g key={`pr-${cx}-${cy}`}>
