@@ -64,11 +64,23 @@ export default function StatsPage() {
   const [error, setError] = useState('');
   const [selectedExercise, setSelectedExercise] = useState('');
   const [selectedVolumeExercise, setSelectedVolumeExercise] = useState('__all__');
+  const [exerciseDays, setExerciseDays] = useState<string>('__all__');
+
+  const DAYS_OPTIONS = [
+    { value: '__all__', label: 'All time' },
+    { value: '7', label: '7 dagar' },
+    { value: '14', label: '14 dagar' },
+    { value: '30', label: '1 månad' },
+    { value: '90', label: '3 månader' },
+    { value: '180', label: '6 månader' },
+    { value: '365', label: '1 år' },
+  ];
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await getStats();
+        const days = exerciseDays !== '__all__' ? parseInt(exerciseDays) : undefined;
+        const data = await getStats(days);
         setStats(data);
         const firstWithWeight = data.top_exercises.find(
           (ex: ExerciseCount) => (data.exercise_progression[ex.name] ?? []).length > 0
@@ -82,7 +94,7 @@ export default function StatsPage() {
     };
 
     fetchStats();
-  }, []);
+  }, [exerciseDays]);
 
   if (loading) {
     return (
@@ -118,7 +130,7 @@ export default function StatsPage() {
         {/* Duration & Intensitet */}
         <div className="stats-card">
           <div className="stats-card-header">
-            <h2>Duration & Intensitet</h2>
+            <h2>Duration & Intensity</h2>
             {stats && Object.keys(stats.volume_by_exercise).length > 0 && (
               <CustomSelect
                 value={selectedVolumeExercise}
@@ -156,7 +168,7 @@ export default function StatsPage() {
                   formatter={(value, name) => {
                     if (name === 'Duration') return Number(value) === 0 ? null : [`${value} min`, 'Duration'];
                     if (value == null) return null;
-                    return [`${value}/10`, 'Intensitet'];
+                    return [`${value}/10`, 'Snittintensitet'];
                   }}
                 />
                 {hasDuration && <Bar yAxisId="left" dataKey="duration" name="Duration" fill="url(#barGradient)" radius={[6, 6, 0, 0]} maxBarSize={40} />}
@@ -182,7 +194,14 @@ export default function StatsPage() {
 
         {/* Most trained exercises */}
         <div className="stats-card">
-          <h2>Most trained exercises</h2>
+          <div className="stats-card-header">
+            <h2>Most trained exercises</h2>
+            <CustomSelect
+              value={exerciseDays}
+              onChange={setExerciseDays}
+              options={DAYS_OPTIONS}
+            />
+          </div>
           {stats && stats.top_exercises.length > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart

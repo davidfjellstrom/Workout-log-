@@ -103,7 +103,8 @@ export async function getExerciseNames(): Promise<ExerciseNameEntry[]> {
 
 // --- Statistik ---
 
-export async function getStats() {
-  const res = await api.get('/stats/');
+export async function getStats(days?: number) {
+  const params = days ? { days } : {};
+  const res = await api.get('/stats/', { params });
   return res.data;
 }

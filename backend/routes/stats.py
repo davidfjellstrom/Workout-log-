@@ -1,7 +1,8 @@
 import logging
 from datetime import date, timedelta
 from collections import defaultdict
-from fastapi import APIRouter, Depends
+from typing import Optional
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from schemas.auth import CurrentUser
@@ -26,6 +27,7 @@ def _iso_week_label(d: date) -> str:
 
 @router.get("/")
 async def get_stats(
+    days: Optional[int] = Query(default=None),
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(get_current_user)
 ):
@@ -67,10 +69,16 @@ async def get_stats(
         sessions_per_week.append({"week": label, "count": week_counts.get(label, 0)})
 
     # --- top_exercises: top 5 by frequency ---
-    top_exercises_query = (
+    top_q = (
         db.query(Exercise.name, func.count(Exercise.id).label("count"))
         .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
         .filter(WorkoutSession.user_id == current_user.user_id)
+    )
+    if days:
+        cutoff = today - timedelta(days=days)
+        top_q = top_q.filter(WorkoutSession.date >= cutoff)
+    top_exercises_query = (
+        top_q
         .group_by(Exercise.name)
         .order_by(func.count(Exercise.id).desc())
         .limit(5)
