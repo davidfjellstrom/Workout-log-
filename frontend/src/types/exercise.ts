@@ -19,3 +19,13 @@ export interface CreateExerciseRequest {
   duration_minutes?: number;
   intensity?: number;
 }
+
+// PATCH skiljer på tre fall: fältet utelämnat = rör inte,
+// null = töm fältet, ett tal = sätt värdet.
+export interface UpdateExerciseRequest {
+  sets?: number | null;
+  reps?: number | null;
+  weight_kg?: number | null;
+  duration_minutes?: number | null;
+  intensity?: number | null;
+}

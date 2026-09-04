@@ -104,8 +104,8 @@ export default function SessionDetailPage() {
   const startEdit = (exercise: Exercise) => {
     setEditingId(exercise.id);
     setEditFields({
-      sets: String(exercise.sets),
-      reps: String(exercise.reps),
+      sets: exercise.sets != null ? String(exercise.sets) : '',
+      reps: exercise.reps != null ? String(exercise.reps) : '',
       weight_kg: exercise.weight_kg != null ? String(exercise.weight_kg) : '',
       duration_minutes: exercise.duration_minutes != null ? String(exercise.duration_minutes) : '',
       intensity: exercise.intensity != null ? String(exercise.intensity) : '',
@@ -115,11 +115,13 @@ export default function SessionDetailPage() {
   const handleSaveEdit = async (exercise: Exercise) => {
     try {
       const updated = await updateExercise(Number(id), exercise.id, {
-        sets: editFields.sets ? Number(editFields.sets) : undefined,
-        reps: editFields.reps ? Number(editFields.reps) : undefined,
-        weight_kg: editFields.weight_kg ? Number(editFields.weight_kg) : undefined,
-        duration_minutes: editFields.duration_minutes ? Number(editFields.duration_minutes) : undefined,
-        intensity: editFields.intensity ? Number(editFields.intensity) : undefined,
+        // null, inte undefined: JSON.stringify tar bort undefined-nycklar
+        // och exclude_unset=True läser avsaknad som "rör inte fältet".
+        sets: editFields.sets ? Number(editFields.sets) : null,
+        reps: editFields.reps ? Number(editFields.reps) : null,
+        weight_kg: editFields.weight_kg ? Number(editFields.weight_kg) : null,
+        duration_minutes: editFields.duration_minutes ? Number(editFields.duration_minutes) : null,
+        intensity: editFields.intensity ? Number(editFields.intensity) : null,
       });
       setSession((prev) =>
         prev ? { ...prev, exercises: prev.exercises.map((e) => e.id === updated.id ? updated : e) } : prev

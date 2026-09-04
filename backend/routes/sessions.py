@@ -2,6 +2,7 @@ import logging
 from datetime import date
 from fastapi import APIRouter, HTTPException, status, Depends, Body
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List
 from schemas.session import SessionCreate, SessionUpdate, SessionResponse, SessionListItem, DuplicateSessionBody
 from schemas.auth import CurrentUser
@@ -64,6 +65,30 @@ async def create_session(
 
     logger.info("New session '%s' created by %s", new_session.title, current_user.username)
     return new_session
+
+
+# OBS: den här litterala pathen MÅSTE ligga före /{session_id} nedan. FastAPI
+# matchar routes i registreringsordning och tar första träffen, så hamnar den
+# efter tolkas "exercise-names" som ett session_id och anropet ger 422.
+@router.get("/exercise-names")
+async def get_exercise_names(
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user)
+):
+    """Returns all unique exercise names the current user has previously used, sorted by frequency.
+    Each entry includes tracks_weight=True if the exercise has ever had a weight value recorded."""
+    rows = (
+        db.query(
+            Exercise.name,
+            func.max(Exercise.weight_kg).label("max_weight")
+        )
+        .join(WorkoutSession, Exercise.session_id == WorkoutSession.id)
+        .filter(WorkoutSession.user_id == current_user.user_id)
+        .group_by(Exercise.name)
+        .order_by(func.count(Exercise.id).desc())
+        .all()
+    )
+    return [{"name": row.name, "tracks_weight": row.max_weight is not None} for row in rows]
 
 
 @router.get("/{session_id}", response_model=SessionResponse)

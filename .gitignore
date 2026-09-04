@@ -1,6 +1,8 @@
 # Environment variables — never commit credentials
 .env
 .env.*
+# ...but the templates should be committed
+!.env.example
 
 # Python
 __pycache__/

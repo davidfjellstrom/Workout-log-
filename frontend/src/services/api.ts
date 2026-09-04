@@ -1,7 +1,7 @@
 import api from '../config/axios';
 import { CreateUserRequest, User } from '../types/user';
 import { Session, SessionListItem, CreateSessionRequest } from '../types/session';
-import { Exercise, CreateExerciseRequest } from '../types/exercise';
+import { Exercise, CreateExerciseRequest, UpdateExerciseRequest } from '../types/exercise';
 
 // --- Användare ---
 
@@ -82,7 +82,7 @@ export async function addExercise(sessionId: number, data: CreateExerciseRequest
   return response.data;
 }
 
-export async function updateExercise(sessionId: number, exerciseId: number, data: Partial<CreateExerciseRequest>): Promise<Exercise> {
+export async function updateExercise(sessionId: number, exerciseId: number, data: UpdateExerciseRequest): Promise<Exercise> {
   const response = await api.patch(`/sessions/${sessionId}/exercises/${exerciseId}`, data);
   return response.data;
 }

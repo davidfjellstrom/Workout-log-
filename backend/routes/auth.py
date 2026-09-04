@@ -70,7 +70,17 @@ async def login(login_data: LoginRequest, response: Response, db: Session = Depe
 @router.post("/logout")
 async def logout(response: Response):
     """Loggar ut användaren genom att rensa cookien."""
-    response.delete_cookie(key="access_token")
+    # Cookien måste rensas med SAMMA attribut som den sattes med. Utan dem
+    # får raderingen Starlettes default (secure=False, samesite="lax"), och
+    # en Lax-cookie i ett cross-site-svar avvisas av webbläsaren — token blir
+    # kvar tills den går ut av sig själv.
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        path="/",
+    )
     return {"message": "Du har loggats ut"}
 
 
